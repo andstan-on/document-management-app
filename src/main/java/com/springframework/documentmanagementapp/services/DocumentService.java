@@ -12,4 +12,9 @@ public interface DocumentService {
     Document getDocumentById(UUID id);
 
 
+    Document saveNewDocument(Document document);
+
+    void updateDocumentById(UUID documentId, Document document);
+
+    void deleteById(UUID documentId);
 }

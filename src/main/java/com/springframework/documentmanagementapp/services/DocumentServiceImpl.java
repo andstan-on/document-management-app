@@ -98,4 +98,63 @@ public class DocumentServiceImpl implements DocumentService {
 
         return documentMap.get(id);
     }
+
+    @Override
+    public Document saveNewDocument(Document document) {
+
+        Document savedDocument = Document.builder()
+                .id(UUID.randomUUID())
+                .type(document.getType())
+                .number(document.getNumber())
+                .dateOfIssue(document.getDateOfIssue())
+                .dateOfPayment(document.getDateOfPayment())
+                .vendorName(document.getVendorName())
+                .vendorInfo(document.getVendorInfo())
+                .customerName(document.getCustomerName())
+                .customerInfo(document.getCustomerInfo())
+                .amountDue(document.getAmountDue())
+                .amountPaid(document.getAmountPaid())
+                .paymentMethod(document.getPaymentMethod())
+                .purchaseOrderNumber(document.getPurchaseOrderNumber())
+                .taxInformation(document.getTaxInformation())
+                .currency(document.getCurrency())
+                .description(document.getDescription())
+                .approvalStatus(document.getApprovalStatus())
+                .comments(document.getComments())
+                .build();
+
+        documentMap.put(savedDocument.getId(), savedDocument);
+
+        return savedDocument;
+    }
+
+    @Override
+    public void updateDocumentById(UUID documentId, Document document) {
+        Document existing = documentMap.get(documentId);
+
+        existing.setType(document.getType());
+        existing.setNumber(document.getNumber());
+        existing.setDateOfIssue(document.getDateOfIssue());
+        existing.setDateOfPayment(document.getDateOfPayment());
+        existing.setVendorName(document.getVendorName());
+        existing.setVendorInfo(document.getVendorInfo());
+        existing.setCustomerName(document.getCustomerName());
+        existing.setCustomerInfo(document.getCustomerInfo());
+        existing.setAmountDue(document.getAmountDue());
+        existing.setAmountPaid(document.getAmountPaid());
+        existing.setPaymentMethod(document.getPaymentMethod());
+        existing.setPurchaseOrderNumber(document.getPurchaseOrderNumber());
+        existing.setTaxInformation(document.getTaxInformation());
+        existing.setCurrency(document.getCurrency());
+        existing.setDescription(document.getDescription());
+        existing.setApprovalStatus(document.getApprovalStatus());
+        existing.setComments(document.getComments());
+
+        documentMap.put(existing.getId(), existing);
+    }
+
+    @Override
+    public void deleteById(UUID documentId) {
+        documentMap.remove(documentId);
+    }
 }
