@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,10 +105,20 @@ class DocumentControllerTest {
     }
 
     @Test
+    void getDocumentByIdNotFound() throws Exception {
+
+        given(documentService.getDocumentById(any(UUID.class))).willReturn(Optional.empty());
+
+        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID, UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
     void getDocumentById() throws Exception {
         Document testDocument = documentServiceImpl.listDocuments().get(0);
 
-        given(documentService.getDocumentById(testDocument.getId())).willReturn(testDocument);
+        given(documentService.getDocumentById(testDocument.getId())).willReturn(Optional.of(testDocument));
 
         mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID, testDocument.getId())
                 .accept(MediaType.APPLICATION_JSON))

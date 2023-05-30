@@ -92,11 +92,11 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document getDocumentById(UUID id) {
+    public Optional<Document> getDocumentById(UUID id) {
 
         log.debug("Get Document by ID - in service" + id.toString());
 
-        return documentMap.get(id);
+        return Optional.ofNullable(documentMap.get(id));
     }
 
     @Override

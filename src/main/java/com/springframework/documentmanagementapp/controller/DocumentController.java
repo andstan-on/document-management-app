@@ -59,6 +59,6 @@ public class DocumentController {
 
         log.debug("Get Document by ID - in controller");
 
-        return documentService.getDocumentById(documentId);
+        return documentService.getDocumentById(documentId).orElseThrow(NotFoundException::new);
     }
 }
