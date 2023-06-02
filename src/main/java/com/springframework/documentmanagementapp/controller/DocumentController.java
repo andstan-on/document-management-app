@@ -44,7 +44,7 @@ public class DocumentController {
         Document savedDocument = documentService.saveNewDocument(document);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/v1/document/" + savedDocument.getId().toString());
+        headers.add("Location", DOCUMENT_PATH + "/" + savedDocument.getId().toString());
 
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
