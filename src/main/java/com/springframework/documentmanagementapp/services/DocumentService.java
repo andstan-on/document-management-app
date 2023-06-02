@@ -18,4 +18,5 @@ public interface DocumentService {
     void updateDocumentById(UUID documentId, Document document);
 
     void deleteById(UUID documentId);
+
 }
