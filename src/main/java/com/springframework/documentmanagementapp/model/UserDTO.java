@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class User {
+public class UserDTO {
     private UUID id;
     private String username;
     private String password;

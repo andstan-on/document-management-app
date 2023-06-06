@@ -1,9 +1,8 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.model.Document;
+import com.springframework.documentmanagementapp.model.DocumentDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,12 +12,12 @@ import java.util.*;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-    private Map<UUID, Document> documentMap;
+    private Map<UUID, DocumentDTO> documentMap;
 
     public DocumentServiceImpl(){
         this.documentMap = new HashMap<>();
 
-        Document document1 = Document.builder()
+        DocumentDTO document1 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("receipt")
                 .number(123456)
@@ -39,7 +38,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .comments("no extra info")
                 .build();
 
-        Document document2 = Document.builder()
+        DocumentDTO document2 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("invoice")
                 .number(113456)
@@ -60,7 +59,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .comments("no extra info")
                 .build();
 
-        Document document3 = Document.builder()
+        DocumentDTO document3 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("receipt")
                 .number(123455)
@@ -87,13 +86,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     }
     @Override
-    public List<Document> listDocuments(){
+    public List<DocumentDTO> listDocuments(){
         return new ArrayList<>(documentMap.values());
 
     }
 
     @Override
-    public Optional<Document> getDocumentById(UUID id) {
+    public Optional<DocumentDTO> getDocumentById(UUID id) {
 
         log.debug("Get Document by ID - in service" + id.toString());
 
@@ -101,9 +100,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document saveNewDocument(Document document) {
+    public DocumentDTO saveNewDocument(DocumentDTO document) {
 
-        Document savedDocument = Document.builder()
+        DocumentDTO savedDocument = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type(document.getType())
                 .number(document.getNumber())
@@ -130,8 +129,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void updateDocumentById(UUID documentId, Document document) {
-        Document existing = documentMap.get(documentId);
+    public Optional<DocumentDTO> updateDocumentById(UUID documentId, DocumentDTO document) {
+        DocumentDTO existing = documentMap.get(documentId);
 
         existing.setType(document.getType());
         existing.setNumber(document.getNumber());
@@ -151,12 +150,14 @@ public class DocumentServiceImpl implements DocumentService {
         existing.setApprovalStatus(document.getApprovalStatus());
         existing.setComments(document.getComments());
 
-        documentMap.put(existing.getId(), existing);
+        return Optional.of(existing);
     }
 
     @Override
-    public void deleteById(UUID documentId) {
+    public Boolean deleteById(UUID documentId) {
         documentMap.remove(documentId);
+
+        return true;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.model.User;
+import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.model.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,12 +11,12 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-    private Map<UUID, User> userMap;
+    private Map<UUID, UserDTO> userMap;
 
     public UserServiceImpl(){
         this.userMap = new HashMap<>();
 
-        User user1 = User.builder()
+        UserDTO user1 = UserDTO.builder()
                 .id(UUID.randomUUID())
                 .username("username1")
                 .password("123456")
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
                 .role(UserRole.REGULAR)
                 .build();
 
-        User user2 = User.builder()
+        UserDTO user2 = UserDTO.builder()
                 .id(UUID.randomUUID())
                 .username("username2")
                 .password("123456")
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
                 .role(UserRole.REGULAR)
                 .build();
 
-        User user3 = User.builder()
+        UserDTO user3 = UserDTO.builder()
                 .id(UUID.randomUUID())
                 .username("username3")
                 .password("123456")
@@ -55,18 +55,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> listUsers() {
+    public List<UserDTO> listUsers() {
         return new ArrayList<>(userMap.values());
     }
 
     @Override
-    public Optional<User> getUserById(UUID id) {
+    public Optional<UserDTO> getUserById(UUID id) {
         return Optional.ofNullable(userMap.get(id));
     }
 
     @Override
-    public User saveNewUser(User user) {
-        User savedUser = User.builder()
+    public UserDTO saveNewUser(UserDTO user) {
+        UserDTO savedUser = UserDTO.builder()
                 .id(UUID.randomUUID())
                 .username(user.getUsername())
                 .password(user.getPassword())
@@ -83,8 +83,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserById(UUID existingId, User user) {
-        User existing = userMap.get(existingId);
+    public Optional<UserDTO> updateUserById(UUID existingId, UserDTO user) {
+        UserDTO existing = userMap.get(existingId);
 
         existing.setUsername(user.getUsername());
         existing.setPassword(user.getPassword());
@@ -94,12 +94,14 @@ public class UserServiceImpl implements UserService {
         existing.setDateOfBirth(user.getDateOfBirth());
         existing.setRole(user.getRole());
 
-        userMap.put(existing.getId(), existing);
+        return Optional.of(existing);
 
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
+    public Boolean deleteUserById(UUID userId) {
         userMap.remove(userId);
+
+        return true;
     }
 }

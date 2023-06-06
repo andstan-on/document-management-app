@@ -1,6 +1,6 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.model.Document;
+import com.springframework.documentmanagementapp.model.DocumentDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,15 +8,15 @@ import java.util.UUID;
 
 public interface DocumentService {
 
-    List<Document> listDocuments();
+    List<DocumentDTO> listDocuments();
 
-    Optional<Document> getDocumentById(UUID id);
+    Optional<DocumentDTO> getDocumentById(UUID id);
 
 
-    Document saveNewDocument(Document document);
+    DocumentDTO saveNewDocument(DocumentDTO document);
 
-    void updateDocumentById(UUID documentId, Document document);
+    Optional<DocumentDTO> updateDocumentById(UUID documentId, DocumentDTO document);
 
-    void deleteById(UUID documentId);
+    Boolean deleteById(UUID documentId);
 
 }

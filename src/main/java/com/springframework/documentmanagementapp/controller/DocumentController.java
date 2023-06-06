@@ -1,11 +1,9 @@
 package com.springframework.documentmanagementapp.controller;
 
-import com.springframework.documentmanagementapp.model.Document;
+import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.services.DocumentService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,22 +24,26 @@ public class DocumentController {
 
     @DeleteMapping(DOCUMENT_PATH_ID)
     public ResponseEntity deleteById(@PathVariable("documentId") UUID documentId){
-        documentService.deleteById(documentId);
+
+        if(! documentService.deleteById(documentId)){
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
 
     }
 
     @PutMapping(DOCUMENT_PATH_ID)
-    public ResponseEntity updateById(@PathVariable("documentId") UUID documentId, @RequestBody Document document){
-        documentService.updateDocumentById(documentId, document);
+    public ResponseEntity updateById(@PathVariable("documentId") UUID documentId, @RequestBody DocumentDTO document){
+       if (documentService.updateDocumentById(documentId, document).isEmpty())
+           throw new NotFoundException();
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(DOCUMENT_PATH)
-    public ResponseEntity handlePost(@RequestBody Document document){
-        Document savedDocument = documentService.saveNewDocument(document);
+    public ResponseEntity handlePost(@RequestBody DocumentDTO document){
+        DocumentDTO savedDocument = documentService.saveNewDocument(document);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", DOCUMENT_PATH + "/" + savedDocument.getId().toString());
@@ -50,12 +52,12 @@ public class DocumentController {
     }
 
     @GetMapping(DOCUMENT_PATH)
-    public List<Document> listDocuments(){
+    public List<DocumentDTO> listDocuments(){
         return documentService.listDocuments();
     }
 
     @GetMapping(DOCUMENT_PATH_ID)
-    public Document getDocumentById(@PathVariable("documentId") UUID documentId) {
+    public DocumentDTO getDocumentById(@PathVariable("documentId") UUID documentId) {
 
         log.debug("Get Document by ID - in controller");
 

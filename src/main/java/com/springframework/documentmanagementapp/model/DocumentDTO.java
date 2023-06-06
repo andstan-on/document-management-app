@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class Document {
+public class DocumentDTO {
     private UUID id;
     private String type;
     private Integer number;

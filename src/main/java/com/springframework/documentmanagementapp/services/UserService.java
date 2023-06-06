@@ -1,6 +1,6 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.model.User;
+import com.springframework.documentmanagementapp.model.UserDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface UserService {
 
-    List<User> listUsers();
+    List<UserDTO> listUsers();
 
-    Optional<User> getUserById(UUID id);
+    Optional<UserDTO> getUserById(UUID id);
 
-    User saveNewUser(User user);
+    UserDTO saveNewUser(UserDTO user);
 
-    void updateUserById(UUID existingId, User user);
+    Optional<UserDTO> updateUserById(UUID existingId, UserDTO user);
 
-    void deleteUserById(UUID userId);
+    Boolean deleteUserById(UUID userId);
 }

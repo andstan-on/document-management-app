@@ -1,9 +1,7 @@
 package com.springframework.documentmanagementapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springframework.documentmanagementapp.model.Document;
-import com.springframework.documentmanagementapp.model.User;
-import com.springframework.documentmanagementapp.services.DocumentServiceImpl;
+import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.services.UserService;
 import com.springframework.documentmanagementapp.services.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,16 +11,12 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +43,7 @@ class UserControllerTest {
     ArgumentCaptor<UUID> uuidArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<User> userArgumentCaptor;
+    ArgumentCaptor<UserDTO> userArgumentCaptor;
 
     @BeforeEach
     void setUp() {
@@ -58,7 +52,9 @@ class UserControllerTest {
 
     @Test
     void deleteById() throws Exception {
-        User user = userServiceImpl.listUsers().get(0);
+        UserDTO user = userServiceImpl.listUsers().get(0);
+
+        given(userService.deleteUserById(any())).willReturn(true);
 
         mockMvc.perform(delete(UserController.USER_PATH_ID, user.getId())
                 .accept(MediaType.APPLICATION_JSON))
@@ -70,7 +66,9 @@ class UserControllerTest {
 
     @Test
     void updateById() throws Exception {
-        User user = userServiceImpl.listUsers().get(0);
+        UserDTO user = userServiceImpl.listUsers().get(0);
+
+        given(userService.updateUserById(any(), any())).willReturn(Optional.of(user));
 
         mockMvc.perform(put(UserController.USER_PATH_ID, user.getId())
                 .accept(MediaType.APPLICATION_JSON)
@@ -78,16 +76,16 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isNoContent());
 
-        verify(userService).updateUserById(any(UUID.class), any(User.class));
+        verify(userService).updateUserById(any(UUID.class), any(UserDTO.class));
 
     }
 
     @Test
     void handlePost() throws Exception {
-        User user = userServiceImpl.listUsers().get(0);
+        UserDTO user = userServiceImpl.listUsers().get(0);
         user.setId(null);
 
-        given(userService.saveNewUser(any(User.class))).willReturn(userServiceImpl.listUsers().get(1));
+        given(userService.saveNewUser(any(UserDTO.class))).willReturn(userServiceImpl.listUsers().get(1));
 
         mockMvc.perform(post(UserController.USER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
@@ -105,7 +103,7 @@ class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length", is(3)));
+                .andExpect(jsonPath("$.length()", is(3)));
     }
 
     @Test
@@ -117,7 +115,7 @@ class UserControllerTest {
 
     @Test
     void getUserById() throws Exception {
-        User user = userServiceImpl.listUsers().get(0);
+        UserDTO user = userServiceImpl.listUsers().get(0);
 
         given(userService.getUserById(user.getId())).willReturn(Optional.of(user));
 

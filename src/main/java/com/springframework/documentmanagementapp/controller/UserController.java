@@ -1,7 +1,6 @@
 package com.springframework.documentmanagementapp.controller;
 
-import com.springframework.documentmanagementapp.model.Document;
-import com.springframework.documentmanagementapp.model.User;
+import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,21 +23,25 @@ public class UserController {
 
     @DeleteMapping(USER_PATH_ID)
     public ResponseEntity deleteById(@PathVariable("userId") UUID userId){
-        userService.deleteUserById(userId);
+        if(! userService.deleteUserById(userId)) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(USER_PATH_ID)
-    public ResponseEntity updateById(@PathVariable("userId") UUID existingId, @RequestBody User user){
-        userService.updateUserById(existingId, user);
+    public ResponseEntity updateById(@PathVariable("userId") UUID existingId, @RequestBody UserDTO user){
+        if (userService.updateUserById(existingId, user).isEmpty())
+            throw new NotFoundException();
+
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(USER_PATH)
-    public ResponseEntity handlePost(@RequestBody User user){
-        User savedUser = userService.saveNewUser(user);
+    public ResponseEntity handlePost(@RequestBody UserDTO user){
+        UserDTO savedUser = userService.saveNewUser(user);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", USER_PATH + "/" + savedUser.getId().toString());
@@ -47,12 +50,12 @@ public class UserController {
     }
 
     @GetMapping(USER_PATH)
-    public List<User> listUsers(){
+    public List<UserDTO> listUsers(){
         return userService.listUsers();
     }
 
     @GetMapping(USER_PATH_ID)
-    public User getUserById(@PathVariable("userId") UUID userId) {
+    public UserDTO getUserById(@PathVariable("userId") UUID userId) {
 
         return userService.getUserById(userId).orElseThrow(NotFoundException::new);
     }
