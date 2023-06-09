@@ -1,0 +1,52 @@
+[
+  {
+    "codes": [
+      "NotNull.userDTO.username",
+      "NotNull.username",
+      "NotNull.java.lang.String",
+      "NotNull"
+    ],
+    "arguments": [
+      {
+        "codes": [
+          "userDTO.username",
+          "username"
+        ],
+        "arguments": null,
+        "defaultMessage": "username",
+        "code": "username"
+      }
+    ],
+    "defaultMessage": "must not be null",
+    "objectName": "userDTO",
+    "field": "username",
+    "rejectedValue": null,
+    "bindingFailure": false,
+    "code": "NotNull"
+  },
+  {
+    "codes": [
+      "NotBlank.userDTO.username",
+      "NotBlank.username",
+      "NotBlank.java.lang.String",
+      "NotBlank"
+    ],
+    "arguments": [
+      {
+        "codes": [
+          "userDTO.username",
+          "username"
+        ],
+        "arguments": null,
+        "defaultMessage": "username",
+        "code": "username"
+      }
+    ],
+    "defaultMessage": "must not be blank",
+    "objectName": "userDTO",
+    "field": "username",
+    "rejectedValue": null,
+    "bindingFailure": false,
+    "code": "NotBlank"
+  }
+]

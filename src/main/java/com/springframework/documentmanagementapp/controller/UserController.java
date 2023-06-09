@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping(USER_PATH_ID)
-    public ResponseEntity updateById(@PathVariable("userId") UUID existingId, @RequestBody UserDTO user){
+    public ResponseEntity updateById(@PathVariable("userId") UUID existingId, @Validated @RequestBody UserDTO user){
         if (userService.updateUserById(existingId, user).isEmpty())
             throw new NotFoundException();
 
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping(USER_PATH)
-    public ResponseEntity handlePost(@RequestBody UserDTO user){
+    public ResponseEntity handlePost(@Validated @RequestBody UserDTO user){
         UserDTO savedUser = userService.saveNewUser(user);
 
         HttpHeaders headers = new HttpHeaders();

@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -48,6 +49,42 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         userServiceImpl = new UserServiceImpl();
+    }
+
+    @Test
+    void testUpdateUserBlankEmail() throws Exception {
+        UserDTO userDTO = userServiceImpl.listUsers().get(0);
+        userDTO.setEmail(" ");
+
+        System.out.println(userDTO.getUsername());
+
+        given(userService.updateUserById(any(UUID.class), any(UserDTO.class))).willReturn(Optional.of(userDTO));
+
+        MvcResult mvcResult = mockMvc.perform(put(UserController.USER_PATH_ID, userDTO.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(status().isBadRequest()).andReturn();
+
+        System.out.println(mvcResult.getResponse().getContentAsString());
+
+    }
+
+    @Test
+    void testCreateUserNullUsername() throws Exception{
+        UserDTO userDTO = UserDTO.builder().build();
+
+        given(userService.saveNewUser(any(UserDTO.class))).willReturn(userServiceImpl.listUsers().get(1));
+
+        MvcResult mvcResult = mockMvc.perform(post(UserController.USER_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(jsonPath("$.length()", is(5)))
+                .andExpect(status().isBadRequest()).andReturn();
+
+        System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test

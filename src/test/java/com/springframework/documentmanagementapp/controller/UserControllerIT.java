@@ -1,22 +1,37 @@
 package com.springframework.documentmanagementapp.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.mappers.UserMapper;
 import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class UserControllerIT {
@@ -29,6 +44,41 @@ class UserControllerIT {
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    WebApplicationContext wac;
+
+    MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @Test
+    void testUpdateByIdBadName() throws Exception {
+        User user = userRepository.findAll().get(0);
+
+       Map<String, Object> userMap = new HashMap<>();
+       userMap.put("username", "NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123NewName123");
+       userMap.put("email", "abc@yahoo.com");
+       userMap.put("dateOfBirth", "2000-06-08");
+
+       System.out.println(objectMapper.writeValueAsString(userMap));
+
+        MvcResult result = mockMvc.perform(put(UserController.USER_PATH_ID, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
 
     @Test
     void testDeleteByIdNotFound() {
