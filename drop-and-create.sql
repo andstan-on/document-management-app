@@ -1,0 +1,12 @@
+drop table if exists app_user;
+drop table if exists document;
+create table app_user (id varchar(36) not null, date_of_birth date not null, email varchar(255) not null, first_name varchar(255), last_name varchar(255), password varchar(255), role smallint, username varchar(30) not null, primary key (id)) engine=InnoDB;
+create table document (id varchar(36) not null, amount_due decimal(38,2), amount_paid decimal(38,2), approval_status varchar(255), comments varchar(255), currency varchar(255), customer_info varchar(255), customer_name varchar(255), date_of_issue date, date_of_payment date, description varchar(255), number integer, payment_method varchar(255), purchase_order_number integer, tax_information varchar(255), type varchar(255), vendor_info varchar(255), vendor_name varchar(255), primary key (id)) engine=InnoDB;
+drop table if exists app_user;
+drop table if exists document;
+create table app_user (id varchar(36) not null, date_of_birth date not null, email varchar(255) not null, first_name varchar(255), last_name varchar(255), password varchar(255), role smallint, username varchar(30) not null, primary key (id)) engine=InnoDB;
+create table document (id varchar(36) not null, amount_due decimal(38,2), amount_paid decimal(38,2), approval_status varchar(255), comments varchar(255), currency varchar(255), customer_info varchar(255), customer_name varchar(255), date_of_issue date, date_of_payment date, description varchar(255), number integer, payment_method varchar(255), purchase_order_number integer, tax_information varchar(255), type varchar(255), vendor_info varchar(255), vendor_name varchar(255), primary key (id)) engine=InnoDB;
+drop table if exists app_user cascade ;
+drop table if exists document cascade ;
+create table app_user (id varchar(36) not null, date_of_birth date not null, email varchar(255) not null, first_name varchar(255), last_name varchar(255), password varchar(255), role smallint, username varchar(30) not null, primary key (id));
+create table document (id varchar(36) not null, amount_due numeric(38,2), amount_paid numeric(38,2), approval_status varchar(255), comments varchar(255), currency varchar(255), customer_info varchar(255), customer_name varchar(255), date_of_issue date, date_of_payment date, description varchar(255), number integer, payment_method varchar(255), purchase_order_number integer, tax_information varchar(255), type varchar(255), vendor_info varchar(255), vendor_name varchar(255), primary key (id));
