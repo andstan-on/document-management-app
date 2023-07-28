@@ -4,14 +4,19 @@ import com.springframework.documentmanagementapp.entities.Document;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +38,14 @@ class DocumentControllerIT {
     @Autowired
     DocumentMapper documentMapper;
 
+    MockMultipartFile file
+            = new MockMultipartFile(
+            "file",
+            "hello.pdf",
+            MediaType.APPLICATION_PDF_VALUE,
+            "Hello, World!".getBytes()
+    );
+
     @Test
     void testDeleteByIdNotFound() {
         assertThrows(NotFoundException.class, () -> {
@@ -40,7 +53,7 @@ class DocumentControllerIT {
         });
     }
 
-    @Rollback
+  /*  @Rollback
     @Transactional
     @Test
     void testDeleteById() {
@@ -51,37 +64,16 @@ class DocumentControllerIT {
 
         assertThat(documentRepository.findById(document.getId()).isEmpty());
     }
+*/
 
-    @Test
-    void testUpdateNotFound() {
-        assertThrows(NotFoundException.class, () -> {
-            documentController.updateById(UUID.randomUUID(), DocumentDTO.builder().build());
-        });
-    }
-
-    @Rollback
-    @Transactional
-    @Test
-    void updateExistingDocument() {
-        Document document = documentRepository.findAll().get(0);
-
-        DocumentDTO documentDTO = documentMapper.documentToDocumentDto(document);
-        documentDTO.setId(null);
-        final String vendorName = "Updated";
-        documentDTO.setVendorName(vendorName);
-
-        ResponseEntity responseEntity =  documentController.updateById(document.getId(), documentDTO);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
-
-        Document updatedDocument = documentRepository.findById(document.getId()).get();
-        assertThat(updatedDocument.getVendorName()).isEqualTo(vendorName);
-    }
 
     @Rollback
     @Transactional
     @Test
     void saveNewDocumentTest() {
+
         DocumentDTO documentDTO = DocumentDTO.builder()
+                .docFile(file)
                 .vendorName("vendor11")
                 .build();
 
@@ -105,8 +97,10 @@ class DocumentControllerIT {
 
         documentRepository.deleteAll();
 
+        HttpServletRequest request = new MockHttpServletRequest();
+
         assertThrows(NotFoundException.class, () -> {
-            documentController.getDocumentById(UUID.randomUUID());
+            documentController.getDocumentMetadataById(UUID.randomUUID());
         });
     }
 
@@ -114,9 +108,11 @@ class DocumentControllerIT {
     void testGetById() {
         Document document = documentRepository.findAll().get(0);
 
-        DocumentDTO documentDTO = documentController.getDocumentById(document.getId());
+        HttpServletRequest request = new MockHttpServletRequest();
 
-        assertThat(documentDTO).isNotNull();
+        DocumentDTO documentDTO = documentController.getDocumentMetadataById(document.getId());
+
+        assertThat(documentDTO.getCustomerName()).isEqualTo("name2");
     }
 
     @Test

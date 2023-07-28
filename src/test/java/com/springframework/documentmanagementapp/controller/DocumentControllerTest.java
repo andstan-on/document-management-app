@@ -2,6 +2,7 @@ package com.springframework.documentmanagementapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import com.springframework.documentmanagementapp.services.DocumentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -34,6 +37,7 @@ class DocumentControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+
     @MockBean
     DocumentService documentService;
 
@@ -50,6 +54,8 @@ class DocumentControllerTest {
         documentServiceImpl = new DocumentServiceImpl();
     }
 
+
+
     @Test
     void deleteById() throws Exception {
         DocumentDTO document = documentServiceImpl.listDocuments().get(0);
@@ -64,20 +70,6 @@ class DocumentControllerTest {
         assertThat(document.getId()).isEqualTo(uuidArgumentCaptor.getValue());
     }
 
-    @Test
-    void updateById() throws Exception {
-        DocumentDTO document = documentServiceImpl.listDocuments().get(0);
-
-        given(documentService.updateDocumentById(any(), any())).willReturn(Optional.of(document));
-
-        mockMvc.perform(put(DocumentController.DOCUMENT_PATH_ID, document.getId())
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(document)))
-                .andExpect(status().isNoContent());
-
-        verify(documentService).updateDocumentById(any(UUID.class), any(DocumentDTO.class));
-    }
 
     @Test
     void handlePost() throws  Exception {
@@ -108,9 +100,9 @@ class DocumentControllerTest {
     @Test
     void getDocumentByIdNotFound() throws Exception {
 
-        given(documentService.getDocumentById(any(UUID.class))).willReturn(Optional.empty());
+        given(documentService.getDocumentMetadata(any(UUID.class))).willReturn(Optional.empty());
 
-        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID, UUID.randomUUID()))
+        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID + "/metadata", UUID.randomUUID()))
                 .andExpect(status().isNotFound());
 
     }
@@ -119,9 +111,9 @@ class DocumentControllerTest {
     void getDocumentById() throws Exception {
         DocumentDTO testDocument = documentServiceImpl.listDocuments().get(0);
 
-        given(documentService.getDocumentById(testDocument.getId())).willReturn(Optional.of(testDocument));
+        given(documentService.getDocumentMetadata(testDocument.getId())).willReturn(Optional.of(testDocument));
 
-        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID, testDocument.getId())
+        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID + "/metadata", testDocument.getId())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

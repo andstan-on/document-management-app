@@ -1,10 +1,16 @@
 package com.springframework.documentmanagementapp.services;
 
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -80,6 +86,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .comments("no extra info")
                 .build();
 
+
+
         documentMap.put(document1.getId(), document1);
         documentMap.put(document2.getId(), document2);
         documentMap.put(document3.getId(), document3);
@@ -92,7 +100,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Optional<DocumentDTO> getDocumentById(UUID id) {
+    public Optional<DocumentDTO> getDocumentMetadata(UUID id) {
 
         log.debug("Get Document by ID - in service" + id.toString());
 
@@ -129,7 +137,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Optional<DocumentDTO> updateDocumentById(UUID documentId, DocumentDTO document) {
+    public Optional<DocumentDTO> updateDocumentMetadata(UUID documentId, DocumentDTO document) {
         DocumentDTO existing = documentMap.get(documentId);
 
         existing.setType(document.getType());
@@ -160,4 +168,14 @@ public class DocumentServiceImpl implements DocumentService {
         return true;
     }
 
+    @Override
+    public Resource getDocumentFile(UUID id) {
+        return null;
+    }
+
+    @Override
+    public Optional<DocumentDTO> updateDocumentFile(UUID documentId, DocumentDTO document) {
+        return Optional.empty() ;
+    }
 }
+

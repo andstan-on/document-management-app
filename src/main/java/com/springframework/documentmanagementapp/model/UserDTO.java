@@ -21,6 +21,8 @@ public class UserDTO {
     private String firstName;
     private String lastName;
 
+    private Integer version;
+
     @NotBlank
     @NotNull
     private String email;

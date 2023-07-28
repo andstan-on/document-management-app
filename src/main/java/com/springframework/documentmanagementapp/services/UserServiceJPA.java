@@ -45,7 +45,7 @@ public class UserServiceJPA implements UserService {
 
         userRepository.findById(existingId).ifPresentOrElse(foundUser -> {
             foundUser.setUsername(user.getUsername());
-            foundUser.setPassword(user.getPassword());
+
             foundUser.setFirstName(user.getFirstName());
             foundUser.setLastName(user.getLastName());
             foundUser.setEmail(user.getEmail());

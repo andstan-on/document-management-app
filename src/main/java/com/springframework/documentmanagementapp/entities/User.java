@@ -9,8 +9,13 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 @Builder
@@ -20,7 +25,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "app_user")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -34,16 +39,58 @@ public class User {
     @Size(max = 30)
     @Column(length = 30)
     private String username;
-    private String password;
+
+    @Version
+    private Integer version;
+
     private String firstName;
     private String lastName;
 
     @NotBlank
     @NotNull
     @Size(max = 255)
+    @Column(unique = true)
     private String email;
 
     @NotNull
     private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    private String password;
+    private boolean locked;
+    private boolean enabled;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(
+                new SimpleGrantedAuthority(role.name())
+        );
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

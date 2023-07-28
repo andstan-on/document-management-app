@@ -1,13 +1,12 @@
 package com.springframework.documentmanagementapp.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.springframework.documentmanagementapp.model.DocumentFileType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,6 +26,13 @@ public class Document {
     @JdbcTypeCode(SqlTypes.CHAR)
     @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     private UUID id;
+
+    @Version
+    private Integer version;
+
+    private String fileName;
+    private DocumentFileType fileType;
+    private String filePath;
 
     private String type;
     private Integer number;

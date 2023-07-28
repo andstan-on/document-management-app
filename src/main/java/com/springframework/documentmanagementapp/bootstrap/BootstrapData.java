@@ -107,7 +107,7 @@ public class BootstrapData implements CommandLineRunner {
             User user1 = User.builder()
 
                     .username("username1")
-                    .password("123456")
+
                     .firstName("fname1")
                     .lastName("lname1")
                     .email("email1")
@@ -118,7 +118,7 @@ public class BootstrapData implements CommandLineRunner {
             User user2 = User.builder()
 
                     .username("username2")
-                    .password("123456")
+
                     .firstName("fname2")
                     .lastName("lname2")
                     .email("email2")
@@ -129,7 +129,7 @@ public class BootstrapData implements CommandLineRunner {
             User user3 = User.builder()
 
                     .username("username3")
-                    .password("123456")
+
                     .firstName("fname3")
                     .lastName("lname3")
                     .email("email3")

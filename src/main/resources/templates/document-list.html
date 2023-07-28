@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+</head>
+<body>
+<h1>Hello, world!</h1>
+<!-- Display the list of documents -->
+<ul>
+    <li th:each="document : ${documents}">
+        <strong th:text="${document.title}"></strong>: <span th:text="${document.content}"></span>
+    </li>
+</ul>
+</body>
+</html>
