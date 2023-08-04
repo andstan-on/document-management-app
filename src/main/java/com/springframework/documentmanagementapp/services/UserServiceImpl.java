@@ -104,4 +104,9 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
+
+    @Override
+    public Optional<UserDTO> getLoggedInUser() {
+        return Optional.empty();
+    }
 }

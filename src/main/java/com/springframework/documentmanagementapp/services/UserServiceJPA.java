@@ -1,8 +1,10 @@
 package com.springframework.documentmanagementapp.services;
 
+import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.mappers.UserMapper;
 import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
+import com.springframework.documentmanagementapp.webutils.WebUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -66,5 +68,14 @@ public class UserServiceJPA implements UserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Optional<UserDTO> getLoggedInUser() {
+
+        User user = WebUtils.getLoggedInUser();
+
+        return Optional.ofNullable(userMapper.userToUserDto(userRepository.findById(user.getId())
+                .orElse(null)));
     }
 }

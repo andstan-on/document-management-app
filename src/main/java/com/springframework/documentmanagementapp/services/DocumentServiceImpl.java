@@ -93,6 +93,13 @@ public class DocumentServiceImpl implements DocumentService {
         documentMap.put(document3.getId(), document3);
 
     }
+
+
+    @Override
+    public List<DocumentDTO> listUserDocuments() {
+        return null;
+    }
+
     @Override
     public List<DocumentDTO> listDocuments(){
         return new ArrayList<>(documentMap.values());

@@ -12,9 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,12 +25,12 @@ public class DocumentController {
 
     private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 
-    public static final String DOCUMENT_PATH = "/api/v1/document";
-    public static final String DOCUMENT_PATH_ID = DOCUMENT_PATH + "/{documentId}";
+    public static final String REST_DOCUMENT_PATH = "/api/v1/document";
+    public static final String REST_DOCUMENT_PATH_ID = REST_DOCUMENT_PATH + "/{documentId}";
 
     private final DocumentService documentService;
 
-    @DeleteMapping(DOCUMENT_PATH_ID)
+    @DeleteMapping(REST_DOCUMENT_PATH_ID)
     public ResponseEntity deleteById(@PathVariable("documentId") UUID documentId){
 
         if(! documentService.deleteById(documentId)){
@@ -43,7 +41,7 @@ public class DocumentController {
 
     }
 
-    @PutMapping(DOCUMENT_PATH_ID + "/metadata")
+    @PutMapping(REST_DOCUMENT_PATH_ID + "/metadata")
     public ResponseEntity updateMetadataById(@PathVariable("documentId") UUID documentId,  @RequestBody DocumentDTO document){
        if (documentService.updateDocumentMetadata(documentId, document).isEmpty())
            throw new NotFoundException();
@@ -51,27 +49,23 @@ public class DocumentController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(DOCUMENT_PATH)
+    @PostMapping(REST_DOCUMENT_PATH)
     public ResponseEntity handlePost(@ModelAttribute DocumentDTO document){
 
         DocumentDTO savedDocument = documentService.saveNewDocument(document);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", DOCUMENT_PATH + "/" + savedDocument.getId().toString());
+        headers.add("Location", REST_DOCUMENT_PATH + "/" + savedDocument.getId().toString());
 
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
-    @GetMapping(DOCUMENT_PATH)
-    public List<DocumentDTO> listDocuments(Model model){
-
-        List<DocumentDTO> documents = documentService.listDocuments();
-        model.addAttribute("documents", documents);
-        return documents;
+    @GetMapping(REST_DOCUMENT_PATH)
+    public List<DocumentDTO> listDocuments(){return documentService.listDocuments();
     }
 
 
-    @GetMapping(DOCUMENT_PATH_ID +"/metadata")
+    @GetMapping(REST_DOCUMENT_PATH_ID +"/metadata")
     public DocumentDTO getDocumentMetadataById(@PathVariable("documentId") UUID documentId) {
 
         log.debug("Get Document by ID - in controller");
@@ -80,7 +74,7 @@ public class DocumentController {
     }
 
 
-    @GetMapping(DOCUMENT_PATH_ID)
+    @GetMapping(REST_DOCUMENT_PATH_ID)
     public ResponseEntity<Resource> getDocumentFileById(@PathVariable("documentId") UUID documentId, HttpServletRequest request) {
 
         // Load file as Resource
@@ -106,7 +100,7 @@ public class DocumentController {
                 .body(resource);
     }
 
-    @PutMapping(DOCUMENT_PATH_ID)
+    @PutMapping(REST_DOCUMENT_PATH_ID)
     public ResponseEntity updateDocumentFile(@PathVariable("documentId") UUID documentId, @ModelAttribute DocumentDTO document) {
         if (documentService.updateDocumentFile(documentId, document).isEmpty())
             throw new NotFoundException();

@@ -17,4 +17,6 @@ public interface UserService {
     Optional<UserDTO> updateUserById(UUID existingId, UserDTO user);
 
     Boolean deleteUserById(UUID userId);
+
+    Optional<UserDTO> getLoggedInUser();
 }

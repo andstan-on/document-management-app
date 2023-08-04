@@ -1,28 +1,18 @@
 package com.springframework.documentmanagementapp.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.springframework.documentmanagementapp.entities.User;
-import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
-@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentDTO {
-    private UUID id;
-
-    private Integer version;
-
+@Builder
+public class DocumentDTOForm {
+    @NotNull
     private MultipartFile docFile;
 
     private String fileName;
@@ -31,13 +21,8 @@ public class DocumentDTO {
 
     private String type;
     private Integer number;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfIssue;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfPayment;
-
     private String vendorName;
     private String vendorInfo;
     private String customerName;
@@ -51,7 +36,4 @@ public class DocumentDTO {
     private String description;
     private String approvalStatus;
     private String comments;
-
-    private User user;
-
 }

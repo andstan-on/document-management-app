@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface DocumentService {
 
+    List<DocumentDTO> listUserDocuments();
+
     List<DocumentDTO> listDocuments();
 
     Optional<DocumentDTO> getDocumentMetadata(UUID id);

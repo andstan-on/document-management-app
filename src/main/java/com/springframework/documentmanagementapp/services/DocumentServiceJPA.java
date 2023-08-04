@@ -3,12 +3,14 @@ package com.springframework.documentmanagementapp.services;
 import com.springframework.documentmanagementapp.controller.FileStorageException;
 import com.springframework.documentmanagementapp.controller.MyFileNotFoundException;
 import com.springframework.documentmanagementapp.entities.Document;
+import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.model.DocumentFileType;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
 import com.springframework.documentmanagementapp.utils.CustomMultipartFile;
+import com.springframework.documentmanagementapp.webutils.WebUtils;
 import jakarta.transaction.Transaction;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +23,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.io.FilenameUtils;
+
 
 
 
@@ -58,6 +64,19 @@ public class DocumentServiceJPA implements DocumentService {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
     }
 
+    @Transactional
+    @Override
+    public List<DocumentDTO> listUserDocuments() {
+
+        User user = WebUtils.getLoggedInUser();
+
+        return documentRepository.findByUserId(user.getId())
+                .stream()
+                .map(documentMapper::documentToDocumentDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
     @Override
     public List<DocumentDTO> listDocuments() {
         return documentRepository.findAll()      
@@ -66,6 +85,7 @@ public class DocumentServiceJPA implements DocumentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public Resource getDocumentFile(UUID id) {
 
@@ -85,6 +105,7 @@ public class DocumentServiceJPA implements DocumentService {
         }
     }
 
+    @Transactional
     @Override
     public Optional<DocumentDTO> getDocumentMetadata(UUID id) {
         return Optional.ofNullable(documentMapper.documentToDocumentDto(documentRepository.findById(id)
@@ -97,8 +118,11 @@ public class DocumentServiceJPA implements DocumentService {
     @Override
     public DocumentDTO saveNewDocument(DocumentDTO document) {
 
-        String fileName = StringUtils.cleanPath(document.getDocFile().getOriginalFilename());
+        User user = WebUtils.getLoggedInUser();
+
+        String fileName = FilenameUtils.removeExtension(document.getDocFile().getOriginalFilename());
         document.setFileName(fileName);
+        document.setUser(user);
 
         //validate name
         if(fileName.contains("..")) {
@@ -124,7 +148,7 @@ public class DocumentServiceJPA implements DocumentService {
         } catch (IOException ex) {
             throw new FileStorageException("Could not create dir");
         }
-        targetLocation = targetLocation.resolve(fileName);
+        targetLocation = targetLocation.resolve(document.getDocFile().getOriginalFilename());
 
         savedDocument.setFilePath(targetLocation.toString());
 
@@ -141,6 +165,7 @@ public class DocumentServiceJPA implements DocumentService {
         return savedDocumentDTO;
     }
 
+    @Transactional
     @Override
     public Optional<DocumentDTO> updateDocumentMetadata(UUID documentId, DocumentDTO document) {
         AtomicReference<Optional<DocumentDTO>> atomicReference = new AtomicReference<>();
@@ -185,7 +210,7 @@ public class DocumentServiceJPA implements DocumentService {
         return false;
     }
 
-
+    @Transactional
     @Override
     public Optional<DocumentDTO> updateDocumentFile(UUID documentId, DocumentDTO newDocument) {
 
@@ -193,19 +218,22 @@ public class DocumentServiceJPA implements DocumentService {
         Optional<DocumentDTO> document = Optional.ofNullable(documentMapper.documentToDocumentDto(documentRepository.findById(documentId)
                 .orElse(null)));
 
-        // get file location and delete
+        // get  original file location for delete
         File file = new File(document.get().getFilePath());
-        file.delete();
 
-        String fileName = StringUtils.cleanPath(newDocument.getDocFile().getOriginalFilename());
+
+        String fileName = FilenameUtils.removeExtension(newDocument.getDocFile().getOriginalFilename());
 
         //validate name
         if(fileName.contains("..")) {
             throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
         }
 
+        Path targetLocation = this.fileStorageLocation.resolve(document.get().getId().toString());
 
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        File directory = new File(targetLocation.toString());
+
+        targetLocation = targetLocation.resolve(newDocument.getDocFile().getOriginalFilename());
         document.get().setFilePath(targetLocation.toString());
         document.get().setFileName(fileName);
         document.get().setDocFile(newDocument.getDocFile());
@@ -227,8 +255,17 @@ public class DocumentServiceJPA implements DocumentService {
         try{
             Files.copy(document.get().getDocFile().getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
-            throw new FileStorageException("Could not store file" + fileName);
+            throw new FileStorageException("Could not store file " + fileName);
         }
+
+        int filesInDir = directory.listFiles().length;
+
+        //delete original file
+        if(file.exists() && !file.isDirectory() && filesInDir==2) {
+            // do something
+            file.delete();
+        }
+
         return document;
 
 

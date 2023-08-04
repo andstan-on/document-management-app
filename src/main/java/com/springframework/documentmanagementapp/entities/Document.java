@@ -51,4 +51,9 @@ public class Document {
     private String description;
     private String approvalStatus;
     private String comments;
+
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
+
 }

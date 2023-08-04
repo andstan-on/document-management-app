@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <form data-th-action="@{'/document/' + ${documentId} + '/update/file'}" data-th-object="${documentDTO}" method="post" class="form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="docFile">Document File</label>
+                    <input class="form-control" type="file" data-th-field="${documentDTO.docFile}" id="docFile">
+                    <div class="alert alert-warning" data-th-if="${#fields.hasErrors('docFile')}" data-th-errors="*{docFile}"></div>
+                </div>
+                <!-- Add other form fields for each attribute in DocumentDTO -->
+                <button type="submit" class="btn btn-success">Upload Document</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

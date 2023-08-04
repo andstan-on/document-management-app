@@ -2,7 +2,6 @@ package com.springframework.documentmanagementapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
-import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import com.springframework.documentmanagementapp.services.DocumentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +11,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -62,7 +59,7 @@ class DocumentControllerTest {
 
         given(documentService.deleteById(any())).willReturn(true);
 
-        mockMvc.perform(delete(DocumentController.DOCUMENT_PATH_ID, document.getId())
+        mockMvc.perform(delete(DocumentController.REST_DOCUMENT_PATH_ID, document.getId())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -78,7 +75,7 @@ class DocumentControllerTest {
 
         given(documentService.saveNewDocument(any(DocumentDTO.class))).willReturn(documentServiceImpl.listDocuments().get(1));
 
-        mockMvc.perform(post(DocumentController.DOCUMENT_PATH)
+        mockMvc.perform(post(DocumentController.REST_DOCUMENT_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(document)))
@@ -90,7 +87,7 @@ class DocumentControllerTest {
     void listDocuments() throws Exception {
         given(documentService.listDocuments()).willReturn(documentServiceImpl.listDocuments());
 
-        mockMvc.perform(get(DocumentController.DOCUMENT_PATH)
+        mockMvc.perform(get(DocumentController.REST_DOCUMENT_PATH)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -102,7 +99,7 @@ class DocumentControllerTest {
 
         given(documentService.getDocumentMetadata(any(UUID.class))).willReturn(Optional.empty());
 
-        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID + "/metadata", UUID.randomUUID()))
+        mockMvc.perform(get(DocumentController.REST_DOCUMENT_PATH_ID + "/metadata", UUID.randomUUID()))
                 .andExpect(status().isNotFound());
 
     }
@@ -113,7 +110,7 @@ class DocumentControllerTest {
 
         given(documentService.getDocumentMetadata(testDocument.getId())).willReturn(Optional.of(testDocument));
 
-        mockMvc.perform(get(DocumentController.DOCUMENT_PATH_ID + "/metadata", testDocument.getId())
+        mockMvc.perform(get(DocumentController.REST_DOCUMENT_PATH_ID + "/metadata", testDocument.getId())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -1,7 +1,7 @@
 package com.springframework.documentmanagementapp.model;
 
 public enum DocumentFileType {
-    PDF("application/pdf"), JPEG("image/png"), PNG("image/jpeg");
+    PDF("application/pdf"), JPEG("image/jpeg"), PNG("image/png");
 
     private String contentType;
 
