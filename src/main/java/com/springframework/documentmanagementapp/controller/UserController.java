@@ -1,5 +1,6 @@
 package com.springframework.documentmanagementapp.controller;
 
+import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.services.UserService;
 import lombok.RequiredArgsConstructor;

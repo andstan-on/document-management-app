@@ -24,7 +24,7 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
 
     @Async
-    public void send(String to, String username, String templateName, String confirmationUrl) throws MessagingException {
+    public void send(String to, String username,String subject, String templateName, String confirmationUrl) throws MessagingException {
 
         if (!StringUtils.hasLength(templateName)) {
             templateName = "confirm-email";
@@ -41,7 +41,14 @@ public class EmailService {
 
         helper.setFrom("andstanon@yahoo.co.uk");
         helper.setTo(to);
-        helper.setSubject("Welcome to the Document Management App");
+
+        if(!StringUtils.hasLength(subject)) {
+            helper.setSubject("Welcome to the Document Management App");
+        }
+        else {
+            helper.setSubject(subject);
+        }
+
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);
 

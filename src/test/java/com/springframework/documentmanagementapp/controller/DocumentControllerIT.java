@@ -1,11 +1,16 @@
 package com.springframework.documentmanagementapp.controller;
 
 import com.springframework.documentmanagementapp.entities.Document;
+import com.springframework.documentmanagementapp.entities.User;
+import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.UserRole;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
+import com.springframework.documentmanagementapp.repositories.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -14,11 +19,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +42,10 @@ class DocumentControllerIT {
 
     @Autowired
     DocumentRepository documentRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
 
     @Autowired
     DocumentMapper documentMapper;
@@ -75,6 +87,7 @@ class DocumentControllerIT {
         DocumentDTO documentDTO = DocumentDTO.builder()
                 .docFile(file)
                 .vendorName("vendor11")
+                .user(userRepository.findAll().get(0))
                 .build();
 
         ResponseEntity responseEntity = documentController.handlePost(documentDTO);

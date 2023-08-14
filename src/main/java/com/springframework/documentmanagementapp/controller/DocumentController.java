@@ -1,5 +1,6 @@
 package com.springframework.documentmanagementapp.controller;
 
+import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import jakarta.servlet.http.HttpServletRequest;

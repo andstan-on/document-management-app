@@ -1,12 +1,14 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.controller.FileStorageException;
-import com.springframework.documentmanagementapp.controller.MyFileNotFoundException;
+import com.springframework.documentmanagementapp.exception.FileStorageException;
+import com.springframework.documentmanagementapp.exception.MyFileNotFoundException;
 import com.springframework.documentmanagementapp.entities.Document;
 import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.model.DocumentFileType;
+import com.springframework.documentmanagementapp.model.DocumentStatus;
+import com.springframework.documentmanagementapp.model.UserRole;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
 import com.springframework.documentmanagementapp.utils.CustomMultipartFile;
@@ -76,6 +78,14 @@ public class DocumentServiceJPA implements DocumentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus) {
+        return documentRepository.findByApprovalStatus(documentStatus)
+                .stream()
+                .map(documentMapper::documentToDocumentDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     @Override
     public List<DocumentDTO> listDocuments() {
@@ -123,6 +133,8 @@ public class DocumentServiceJPA implements DocumentService {
         String fileName = FilenameUtils.removeExtension(document.getDocFile().getOriginalFilename());
         document.setFileName(fileName);
         document.setUser(user);
+
+        document.setApprovalStatus(user.getRole() == UserRole.ADMIN ? DocumentStatus.APPROVED : DocumentStatus.PENDING);
 
         //validate name
         if(fileName.contains("..")) {
@@ -269,5 +281,19 @@ public class DocumentServiceJPA implements DocumentService {
         return document;
 
 
+    }
+
+    @Override
+    public Optional<DocumentDTO> updateDocumentStatus(UUID documentId, DocumentStatus documentStatus) {
+        AtomicReference<Optional<DocumentDTO>> atomicReference = new AtomicReference<>();
+
+        documentRepository.findById(documentId).ifPresentOrElse(foundDocument -> {
+            foundDocument.setApprovalStatus(documentStatus);
+            atomicReference.set(Optional.of(documentMapper.documentToDocumentDto(documentRepository.save(foundDocument))));
+        }, () -> {
+            atomicReference.set(Optional.empty());
+        });
+
+        return atomicReference.get();
     }
 }

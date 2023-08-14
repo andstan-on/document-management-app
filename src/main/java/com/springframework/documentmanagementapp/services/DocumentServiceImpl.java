@@ -1,6 +1,7 @@
 package com.springframework.documentmanagementapp.services;
 
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentStatus;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("approved")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
 
@@ -61,7 +62,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("approved")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
 
@@ -82,7 +83,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("pending")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
 
@@ -97,6 +98,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentDTO> listUserDocuments() {
+        return null;
+    }
+
+    @Override
+    public List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus) {
         return null;
     }
 
@@ -183,6 +189,11 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Optional<DocumentDTO> updateDocumentFile(UUID documentId, DocumentDTO document) {
         return Optional.empty() ;
+    }
+
+    @Override
+    public Optional<DocumentDTO> updateDocumentStatus(UUID documentId, DocumentStatus documentStatus) {
+        return Optional.empty();
     }
 }
 

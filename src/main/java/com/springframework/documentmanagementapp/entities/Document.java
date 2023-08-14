@@ -1,6 +1,7 @@
 package com.springframework.documentmanagementapp.entities;
 
 import com.springframework.documentmanagementapp.model.DocumentFileType;
+import com.springframework.documentmanagementapp.model.DocumentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -49,7 +50,7 @@ public class Document {
     private String taxInformation;
     private String currency;
     private String description;
-    private String approvalStatus;
+    private DocumentStatus approvalStatus;
     private String comments;
 
     @ManyToOne

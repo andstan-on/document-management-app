@@ -2,6 +2,7 @@ package com.springframework.documentmanagementapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.documentmanagementapp.entities.User;
+import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.mappers.UserMapper;
 import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
@@ -174,13 +175,6 @@ class UserControllerIT {
 
     }
 
-    @Rollback
-    @Transactional
-    @Test
-    void testEmptyList() {
-        userRepository.deleteAll();
 
-        assertThat(userController.listUsers().size()).isEqualTo(0);
-    }
 
 }

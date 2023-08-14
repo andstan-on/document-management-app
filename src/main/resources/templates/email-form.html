@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <form data-th-action="@{/authentication/reset}" data-th-object="${emailDTO}" method="post" class="form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input class="form-control" type="email" data-th-field="*{email}" id="email">
+                    <div class="alert alert-warning" data-th-if="${#fields.hasErrors('email')}" data-th-errors="*{email}"></div>
+                    <div data-th-if="${emailError}" class="alert alert-danger">
+                        <p data-th-text="${emailError}"></p>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

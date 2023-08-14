@@ -1,8 +1,10 @@
 package com.springframework.documentmanagementapp.controller;
 
+import com.springframework.documentmanagementapp.exception.RegistrationException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,4 +48,5 @@ public class CustomErrorController {
 
         return ResponseEntity.badRequest().body(errorList);
     }
+
 }

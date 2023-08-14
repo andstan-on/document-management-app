@@ -1,4 +1,4 @@
-package com.springframework.documentmanagementapp.controller;
+package com.springframework.documentmanagementapp.exception;
 
 public class FileStorageException extends RuntimeException {
     public FileStorageException(String message) {

@@ -74,6 +74,9 @@
                 <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Document</button>
             </form>
         </div>
+        <div class="col-md-12 mt-4">
+            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/status'}">Update Status</a>
+        </div>
     </div>
 </div>
 

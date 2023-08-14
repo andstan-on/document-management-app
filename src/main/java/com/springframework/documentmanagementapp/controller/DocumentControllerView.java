@@ -1,10 +1,7 @@
 package com.springframework.documentmanagementapp.controller;
 
 import com.springframework.documentmanagementapp.entities.User;
-import com.springframework.documentmanagementapp.model.DocumentDTO;
-import com.springframework.documentmanagementapp.model.DocumentDTOForm;
-import com.springframework.documentmanagementapp.model.UserDTO;
-import com.springframework.documentmanagementapp.model.UserRole;
+import com.springframework.documentmanagementapp.model.*;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import com.springframework.documentmanagementapp.services.UserService;
 import com.springframework.documentmanagementapp.webutils.WebUtils;
@@ -53,21 +50,11 @@ public class DocumentControllerView {
 
         List<DocumentDTO> documents = documentService.listDocuments();
         model.addAttribute("documents", documents);
-
         return "document-list";
     }
 
     @GetMapping("/")
     public String listUserDocuments( Model model){
-
-        //get logged in user
-        User user = WebUtils.getLoggedInUser();
-
-        //check user role
-        if (user.getRole() == UserRole.ADMIN){
-
-            return "admin-panel";
-        }
 
 
         List<DocumentDTO> documents = documentService.listUserDocuments();
@@ -130,8 +117,13 @@ public class DocumentControllerView {
         if (result.hasErrors()) {
             return "uploadDoc";
         }
-        DocumentDTO savedDocument = documentService.saveNewDocument(documentDTO);
-        return "redirect:/";
+        try {
+            DocumentDTO savedDocument = documentService.saveNewDocument(documentDTO);
+            return "redirect:/";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", "Doc type not supported");
+            return "uploadDoc";
+        }
     }
 
     @PostMapping(DOCUMENT_PATH_ID + "/delete")
@@ -175,6 +167,35 @@ public class DocumentControllerView {
         }
         Optional<DocumentDTO> savedDocument = documentService.updateDocumentFile(documentId, documentDTO);
         return "redirect:" + DOCUMENT_PATH_ID;
+    }
+
+
+    @GetMapping(DOCUMENT_PATH_ID + "/update/status")
+    public String getUpdateDocStatus(@PathVariable("documentId") UUID documentId, Model model){
+
+        model.addAttribute("documentId", documentId);
+
+        return "document-status-update";
+    }
+
+    @PostMapping(DOCUMENT_PATH_ID +"/update/status")
+    public String postUpdateDocStatus(@PathVariable("documentId") UUID documentId, @RequestPart("status") String status, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "document-status-update";
+        }
+
+        documentService.updateDocumentStatus(documentId, DocumentStatus.valueOf(status.toUpperCase()));
+
+        return "redirect:" + DOCUMENT_PATH_ID;
+    }
+
+    @GetMapping("/admin")
+    public String getAdminPanel(Model model){
+
+        List<DocumentDTO> pendingDocuments = documentService.listDocumentsByApprovalStatus(DocumentStatus.PENDING);
+
+        model.addAttribute("pendingDocuments", pendingDocuments);
+        return "admin-panel";
     }
 
 

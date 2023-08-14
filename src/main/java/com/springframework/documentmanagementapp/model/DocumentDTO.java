@@ -49,7 +49,7 @@ public class DocumentDTO {
     private String taxInformation;
     private String currency;
     private String description;
-    private String approvalStatus;
+    private DocumentStatus approvalStatus;
     private String comments;
 
     private User user;

@@ -4,6 +4,7 @@ import com.springframework.documentmanagementapp.services.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -52,9 +55,14 @@ public class SecurityConfig {
 
         http.
                 csrf().disable().
-                authorizeHttpRequests().requestMatchers("/api/v*/authentication/**")
+                authorizeHttpRequests().requestMatchers("/api/v*/authentication/**", "/authentication/**")
                 .permitAll()
-                .anyRequest().authenticated().and().formLogin();
+                .anyRequest().authenticated().and().formLogin().loginPage("/login")
+                .loginProcessingUrl("/process-login")
+                .defaultSuccessUrl("/home")
+                .failureUrl("/login?error=true").permitAll();
+
+
 
 
         return http.build();

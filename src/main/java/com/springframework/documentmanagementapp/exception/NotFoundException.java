@@ -1,4 +1,4 @@
-package com.springframework.documentmanagementapp.controller;
+package com.springframework.documentmanagementapp.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,3 +24,4 @@ public class NotFoundException extends RuntimeException {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
+

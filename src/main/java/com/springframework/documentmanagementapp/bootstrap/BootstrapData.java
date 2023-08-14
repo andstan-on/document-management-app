@@ -2,10 +2,7 @@ package com.springframework.documentmanagementapp.bootstrap;
 
 import com.springframework.documentmanagementapp.entities.Document;
 import com.springframework.documentmanagementapp.entities.User;
-import com.springframework.documentmanagementapp.model.DocumentDTO;
-import com.springframework.documentmanagementapp.model.DocumentFileType;
-import com.springframework.documentmanagementapp.model.UserDTO;
-import com.springframework.documentmanagementapp.model.UserRole;
+import com.springframework.documentmanagementapp.model.*;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
@@ -41,7 +38,7 @@ public class BootstrapData implements CommandLineRunner {
     public void run(String... args) throws Exception{
         loadUserData();
         loadDocumentData();
-        loadFileOnDisk();
+       // loadFileOnDisk();
     }
 
 
@@ -83,7 +80,7 @@ public class BootstrapData implements CommandLineRunner {
                     .taxInformation("tax info")
                     .currency("USD")
                     .description("description")
-                    .approvalStatus("approved")
+                    .approvalStatus(DocumentStatus.APPROVED)
                     .comments("no extra info")
                     .build();
 
@@ -109,7 +106,7 @@ public class BootstrapData implements CommandLineRunner {
                     .taxInformation("tax info")
                     .currency("USD")
                     .description("description")
-                    .approvalStatus("approved")
+                    .approvalStatus(DocumentStatus.APPROVED)
                     .comments("no extra info")
                     .build();
 
@@ -135,7 +132,7 @@ public class BootstrapData implements CommandLineRunner {
                     .taxInformation("tax info")
                     .currency("USD")
                     .description("description")
-                    .approvalStatus("pending")
+                    .approvalStatus(DocumentStatus.APPROVED)
                     .comments("no extra info")
                     .build();
 
