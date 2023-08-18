@@ -62,7 +62,13 @@ public class DocumentController {
     }
 
     @GetMapping(REST_DOCUMENT_PATH)
-    public List<DocumentDTO> listDocuments(){return documentService.listDocuments();
+    public List<DocumentDTO> listDocuments(@RequestParam(required = false) String searchedCriteria){
+        return documentService.listDocuments(null);
+    }
+
+    @GetMapping(REST_DOCUMENT_PATH + "/test")
+    public List<DocumentDTO> listFilteredDocuments(@RequestParam String searchedCriteria){
+        return documentService.filterDocuments(searchedCriteria);
     }
 
 

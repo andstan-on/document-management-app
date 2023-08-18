@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav data-th-replace="~{layout :: admin-nav}"></nav>
+
+
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="container mt-4">
+
+                <form method="get" action="/admin/users/page/1" id="searchForm" class="form-inline">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" name="searchedCriteria" class="form-control" placeholder="Search documents...">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <h2>Users</h2>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Profile</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-th-each="user : ${userPage.content}" data-th-if="${#authentication.getPrincipal().getUsername() != user.username}">
+                        <td data-th-text="${user.username}"></td>
+                        <td data-th-text="${user.email}"></td>
+                        <td data-th-text="${user.role}"></td>
+                        <td> <!-- New table cell for the link -->
+                            <a data-th-href="@{/admin/user/{userId}/page/1(userId=${user.id})}" class="btn btn-primary">View Profile</a>
+                        </td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div data-th-replace="~{layout :: pagination}"></div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

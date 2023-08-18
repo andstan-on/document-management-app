@@ -2,16 +2,12 @@ package com.springframework.documentmanagementapp.services;
 
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.model.DocumentStatus;
-import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -97,17 +93,22 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     @Override
-    public List<DocumentDTO> listUserDocuments() {
+    public Page<DocumentDTO> listUserDocuments(UUID userId, String searchedCriteria, Integer pageNumber, Integer pageSize) {
         return null;
     }
 
     @Override
-    public List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus) {
+    public Page<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus, String searchedCriteria, Integer pageNumber, Integer pageSize) {
         return null;
     }
 
     @Override
-    public List<DocumentDTO> listDocuments(){
+    public List<DocumentDTO> filterDocuments(String searchedCriteria) {
+        return null;
+    }
+
+    @Override
+    public List<DocumentDTO> listDocuments(UUID userId){
         return new ArrayList<>(documentMap.values());
 
     }

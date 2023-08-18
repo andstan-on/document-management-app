@@ -3,6 +3,7 @@ package com.springframework.documentmanagementapp.services;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
 import com.springframework.documentmanagementapp.model.DocumentStatus;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +11,13 @@ import java.util.UUID;
 
 public interface DocumentService {
 
-    List<DocumentDTO> listUserDocuments();
+    Page<DocumentDTO> listUserDocuments(UUID userId, String searchedCriteria, Integer pageNumber, Integer pageSize);
 
-    List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus);
+    Page<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus, String searchedCriteria, Integer pageNumber, Integer pageSize);
 
-    List<DocumentDTO> listDocuments();
+    List<DocumentDTO> filterDocuments(String searchedCriteria);
+
+    List<DocumentDTO> listDocuments(UUID userId);
 
     Optional<DocumentDTO> getDocumentMetadata(UUID id);
 

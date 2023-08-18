@@ -31,6 +31,29 @@ public class UserRegistrationService {
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
 
+
+    @Transactional
+    public void createUserInAdminPanel(CreateUserDTO createUserDTO){
+
+        createUserDTO.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
+        User user = userMapper.userCreationDtotoUser(createUserDTO);
+
+        boolean userEmailExists = userRepository.findByEmail(user.getEmail()).isPresent();
+        if (userEmailExists){
+            throw new EmailAlreadyExistsException("A user already exists with the same email");
+        }
+
+        boolean userUsernameExists = userRepository.findByUsername(user.getUsername()).isPresent();
+        if (userUsernameExists){
+            throw new UsernameAlreadyExistsException("A user already exists with the same username");
+        }
+
+
+        user.setLocked(false);
+        User savedUser = userRepository.save(user);
+
+    }
+
     @Transactional
     public String register(UserRegistrationDTO userDTO) {
 

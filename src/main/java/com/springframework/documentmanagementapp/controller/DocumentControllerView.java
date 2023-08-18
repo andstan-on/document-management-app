@@ -1,33 +1,24 @@
 package com.springframework.documentmanagementapp.controller;
 
-import com.springframework.documentmanagementapp.entities.User;
+import com.springframework.documentmanagementapp.exception.EmailAlreadyExistsException;
+import com.springframework.documentmanagementapp.exception.UsernameAlreadyExistsException;
 import com.springframework.documentmanagementapp.model.*;
 import com.springframework.documentmanagementapp.services.DocumentService;
+import com.springframework.documentmanagementapp.services.UserRegistrationService;
 import com.springframework.documentmanagementapp.services.UserService;
-import com.springframework.documentmanagementapp.webutils.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,25 +34,49 @@ public class DocumentControllerView {
 
     private final DocumentService documentService;
     private final UserService userService;
+    private final UserRegistrationService userRegistrationService;
 
+
+    @GetMapping("/")
+    public String viewHomePage(Model model) {
+        return listUserDocuments(1, null, model);
+    }
 
     @GetMapping(DOCUMENT_PATH)
-    public String listDocuments( Model model){
+    public String viewDocuments(Model model) {
+        return listDocuments(1, null, model);
+    }
 
-        List<DocumentDTO> documents = documentService.listDocuments();
-        model.addAttribute("documents", documents);
+    @GetMapping(DOCUMENT_PATH + "/page/{pageNumber}")
+    public String listDocuments(@PathVariable Integer pageNumber,
+                                @RequestParam(required = false) String searchedCriteria,
+                                Model model){
+
+        Page<DocumentDTO> documentPage = documentService.listDocumentsByApprovalStatus(DocumentStatus.APPROVED,searchedCriteria, pageNumber, 10);
+        model.addAttribute("documentPage", documentPage);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", documentPage.getTotalPages());
+        model.addAttribute("totalItems", documentPage.getTotalElements());
+
         return "document-list";
     }
 
-    @GetMapping("/")
-    public String listUserDocuments( Model model){
+    @GetMapping("/{pageNumber}")
+    public String listUserDocuments(@PathVariable Integer pageNumber,
+                                    @RequestParam(required = false) String searchedCriteria,
+                                    Model model){
 
+       Page<DocumentDTO> documentPage = documentService.listUserDocuments(null, searchedCriteria, pageNumber, 10);
+        model.addAttribute("documentPage", documentPage);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", documentPage.getTotalPages());
+        model.addAttribute("totalItems", documentPage.getTotalElements());
 
-        List<DocumentDTO> documents = documentService.listUserDocuments();
-        model.addAttribute("documents", documents);
 
         return "index";
     }
+
+
 
     @GetMapping("/user/profile")
     public String getUserProfile(Model model){
@@ -189,14 +204,118 @@ public class DocumentControllerView {
         return "redirect:" + DOCUMENT_PATH_ID;
     }
 
-    @GetMapping("/admin")
-    public String getAdminPanel(Model model){
-
-        List<DocumentDTO> pendingDocuments = documentService.listDocumentsByApprovalStatus(DocumentStatus.PENDING);
-
-        model.addAttribute("pendingDocuments", pendingDocuments);
-        return "admin-panel";
+    @GetMapping("/admin/dashboard")
+    public String getAdminPanelNoPage(Model model){
+        return getAdminPanel(1, null, model);
     }
+
+    @GetMapping("/admin/dashboard/{pageNumber}")
+    public String getAdminPanel(@PathVariable Integer pageNumber,
+                                @RequestParam(required = false) String searchedCriteria,
+                                Model model){
+
+        Page<DocumentDTO> documentPage = documentService.listDocumentsByApprovalStatus(DocumentStatus.PENDING,searchedCriteria, pageNumber, 10);
+        model.addAttribute("documentPage", documentPage);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", documentPage.getTotalPages());
+        model.addAttribute("totalItems", documentPage.getTotalElements());
+        return "admin-panel-dashboard";
+    }
+
+    @GetMapping("/admin/users")
+    public String listUsersAdminPanelNoPage(Model model){
+        return listUsersAdminPanel(1, null, model);
+    }
+
+    @GetMapping("/admin/users/page/{pageNumber}")
+    public String listUsersAdminPanel(@PathVariable Integer pageNumber,
+                            @RequestParam(required = false) String searchedCriteria,
+                            Model model){
+
+        Page<UserDTO> userPage = userService.pageUsers(searchedCriteria, pageNumber, 10);
+        model.addAttribute("userPage", userPage);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("totalItems", userPage.getTotalElements());
+        return "admin-panel-users";
+    }
+
+
+    @GetMapping("/admin/create/user")
+    public String getCreateUserForm(Model model){
+
+        model.addAttribute("createUserDTO", new CreateUserDTO());
+
+        return "admin-panel-create-user";
+    }
+
+    @PostMapping("/admin/create/user")
+    public String postCreateUser(@Valid CreateUserDTO createUserDTO, BindingResult result, Model model){
+        if (result.hasErrors()) {
+            return "admin-panel-create-user";
+        }
+        try {
+            userRegistrationService.createUserInAdminPanel(createUserDTO);
+            return "redirect:/admin/users/page/1";
+        } catch (EmailAlreadyExistsException ex) {
+            model.addAttribute("emailError", ex.getMessage());
+            return "admin-panel-create-user";
+        } catch (UsernameAlreadyExistsException ex) {
+            model.addAttribute("usernameError", ex.getMessage());
+            return "admin-panel-create-user";
+        }
+    }
+
+    @GetMapping("/admin/user/{userId}/page/{pageNumber}")
+    public String getUserInAdminPane(@PathVariable("userId") UUID userId,
+                                     @PathVariable("pageNumber") Integer pageNumber,
+                                     Model model){
+
+        Page<DocumentDTO> documentPage = documentService.listUserDocuments(userId, null, pageNumber, 10);
+
+        model.addAttribute("user", userService.getUserById(userId).get());
+        model.addAttribute("documentPage", documentPage);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", documentPage.getTotalPages());
+        model.addAttribute("totalItems", documentPage.getTotalElements());
+
+        return "admin-panel-user-profile";
+    }
+
+    @PostMapping("/admin/user/{userId}/delete")
+    public String deleteUserAndRelatedDocs(@PathVariable("userId") UUID userId){
+
+        List<DocumentDTO> documentDTOList = documentService.listDocuments(userId);
+
+        for(DocumentDTO documentDTO : documentDTOList) {
+            documentService.deleteById(documentDTO.getId());
+        }
+        userService.deleteUserById(userId);
+
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/admin/user/{userId}/update/role")
+    public String getUpdateUserRoleForm(@PathVariable("userId") UUID userId, Model model){
+        model.addAttribute("userId", userId);
+
+        return "admin-panel-update-user-role";
+    }
+
+    @PostMapping("/admin/user/{userId}/update/role")
+    public String adminPanelUpdateUserRole(@PathVariable("userId") UUID userId,@RequestPart("role") String role, BindingResult result, Model model){
+        if (result.hasErrors()) {
+            return "admin-panel-update-user-role";
+        }
+
+        userService.updateUserRole(userId, UserRole.valueOf(role.toUpperCase()));
+
+        return "redirect:" + "/admin/user/{userId}/page/1";
+    }
+
+
+
+
 
 
 }

@@ -3,6 +3,7 @@ package com.springframework.documentmanagementapp.services;
 import com.springframework.documentmanagementapp.model.UserDTO;
 import com.springframework.documentmanagementapp.model.UserRole;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -60,6 +61,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDTO> pageUsers(String searchedCriteria, Integer pageNumber, Integer pageSize) {
+        return null;
+    }
+
+    @Override
     public Optional<UserDTO> getUserById(UUID id) {
         return Optional.ofNullable(userMap.get(id));
     }
@@ -96,6 +102,11 @@ public class UserServiceImpl implements UserService {
 
         return Optional.of(existing);
 
+    }
+
+    @Override
+    public Optional<UserDTO> updateUserRole(UUID userId, UserRole userRole) {
+        return Optional.empty();
     }
 
     @Override

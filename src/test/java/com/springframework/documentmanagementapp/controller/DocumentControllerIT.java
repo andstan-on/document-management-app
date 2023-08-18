@@ -130,7 +130,7 @@ class DocumentControllerIT {
 
     @Test
     void testListDocuments() {
-        List<DocumentDTO> dtos = documentController.listDocuments();
+        List<DocumentDTO> dtos = documentController.listDocuments(null);
 
         assertThat(dtos.size()).isEqualTo(3);
     }
@@ -142,7 +142,7 @@ class DocumentControllerIT {
 
         documentRepository.deleteAll();
 
-        List<DocumentDTO> dtos = documentController.listDocuments();
+        List<DocumentDTO> dtos = documentController.listDocuments(null);
 
         assertThat(dtos.size()).isEqualTo(0);
     }

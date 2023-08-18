@@ -57,10 +57,16 @@ public class SecurityConfig {
                 csrf().disable().
                 authorizeHttpRequests().requestMatchers("/api/v*/authentication/**", "/authentication/**")
                 .permitAll()
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated().and().formLogin().loginPage("/login")
                 .loginProcessingUrl("/process-login")
-                .defaultSuccessUrl("/home")
-                .failureUrl("/login?error=true").permitAll();
+                .defaultSuccessUrl("/")
+                .failureUrl("/login?error=true").permitAll()
+                .and()
+                .logout() // Configure logout behavior
+                .logoutUrl("/logout") // Define the logout URL
+                .logoutSuccessUrl("/login") // Redirect after successful logout
+                .invalidateHttpSession(true);
 
 
 

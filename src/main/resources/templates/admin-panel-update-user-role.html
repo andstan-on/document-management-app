@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<!-- Display the list of documents -->
+<div class="container mt-4">
+    <h2>Document status</h2>
+    <!-- Add the form here -->
+    <form data-th-action="@{'/admin/user/' + ${userId} + '/update/role'}" method="post" class="form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="role">Select user role:</label>
+            <select id="role" name="role" class="form-control">
+                <option value="REGULAR">Regular</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update role</button>
+    </form>
+</div>
+
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+</html>

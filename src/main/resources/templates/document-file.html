@@ -39,7 +39,7 @@
         </div>
         <div class="card-footer">
             <!-- Add a button to update metadata -->
-            <button class="btn btn-primary" onclick="openUpdateMetadataModal()">Update Metadata</button>
+            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/metadata'}">Update Metadata</a>
         </div>
     </div>
 

@@ -57,7 +57,7 @@ class DocumentControllerTest {
 
     @Test
     void deleteById() throws Exception {
-        DocumentDTO document = documentServiceImpl.listDocuments().get(0);
+        DocumentDTO document = documentServiceImpl.listDocuments(null).get(0);
 
         given(documentService.deleteById(any())).willReturn(true);
 
@@ -72,10 +72,10 @@ class DocumentControllerTest {
 
     @Test
     void handlePost() throws  Exception {
-        DocumentDTO document = documentServiceImpl.listDocuments().get(0);
+        DocumentDTO document = documentServiceImpl.listDocuments(null).get(0);
         document.setId(null);
 
-        given(documentService.saveNewDocument(any(DocumentDTO.class))).willReturn(documentServiceImpl.listDocuments().get(1));
+        given(documentService.saveNewDocument(any(DocumentDTO.class))).willReturn(documentServiceImpl.listDocuments(null).get(1));
 
         mockMvc.perform(post(DocumentController.REST_DOCUMENT_PATH)
                 .accept(MediaType.APPLICATION_JSON)
@@ -87,7 +87,7 @@ class DocumentControllerTest {
 
     @Test
     void listDocuments() throws Exception {
-        given(documentService.listDocuments()).willReturn(documentServiceImpl.listDocuments());
+        given(documentService.listDocuments(null)).willReturn(documentServiceImpl.listDocuments(null));
 
         mockMvc.perform(get(DocumentController.REST_DOCUMENT_PATH)
                         .accept(MediaType.APPLICATION_JSON))
@@ -108,7 +108,7 @@ class DocumentControllerTest {
 
     @Test
     void getDocumentById() throws Exception {
-        DocumentDTO testDocument = documentServiceImpl.listDocuments().get(0);
+        DocumentDTO testDocument = documentServiceImpl.listDocuments(null).get(0);
 
         given(documentService.getDocumentMetadata(testDocument.getId())).willReturn(Optional.of(testDocument));
 

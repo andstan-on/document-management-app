@@ -11,35 +11,22 @@ import com.springframework.documentmanagementapp.model.DocumentStatus;
 import com.springframework.documentmanagementapp.model.UserRole;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
-import com.springframework.documentmanagementapp.utils.CustomMultipartFile;
+import com.springframework.documentmanagementapp.repositories.UserRepository;
 import com.springframework.documentmanagementapp.webutils.WebUtils;
-import jakarta.transaction.Transaction;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.io.FilenameUtils;
-
-
+import org.springframework.util.StringUtils;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -56,40 +43,117 @@ import java.util.stream.Collectors;
 @Primary
 public class DocumentServiceJPA implements DocumentService {
     private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
     private final Path fileStorageLocation;
 
+    private final static int DEFAULT_PAGE = 0;
+    private final static int DEFAULT_PAGE_SIZE = 10;
+
     @Autowired
-    public DocumentServiceJPA(final DocumentRepository documentRepository, final DocumentMapper documentMapper, final FileStorageProperties fileStorageProperties) {
+    public DocumentServiceJPA(final DocumentRepository documentRepository, final UserRepository userRepository, final DocumentMapper documentMapper, final FileStorageProperties fileStorageProperties) {
         this.documentRepository = documentRepository;
+        this.userRepository = userRepository;
         this.documentMapper = documentMapper;
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
     }
 
+    //page request
+    public PageRequest buildPageRequest(Integer pageNumber, Integer pageSize){
+        int queryPageNumber;
+        int queryPageSize;
+
+        if(pageNumber != null && pageNumber > 0){
+            queryPageNumber = pageNumber - 1;
+        } else {
+            queryPageNumber = DEFAULT_PAGE;
+        }
+
+        if(pageSize == null) {
+            queryPageSize = DEFAULT_PAGE_SIZE;
+        } else {
+            if(pageSize > 100){
+                queryPageSize = 100;
+            } else {
+                queryPageSize = pageSize;
+            }
+        }
+
+        Sort sort = Sort.by(Sort.Order.asc("fileName"));
+
+        return PageRequest.of(queryPageNumber, queryPageSize, sort);
+    }
+
+
     @Transactional
     @Override
-    public List<DocumentDTO> listUserDocuments() {
+    public Page<DocumentDTO> listUserDocuments(UUID userId, String searchedCriteria, Integer pageNumber, Integer pageSize) {
 
-        User user = WebUtils.getLoggedInUser();
+        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
 
-        return documentRepository.findByUserId(user.getId())
+        User user;
+
+        if(userId != null){
+            user = userRepository.findById(userId).get();
+        }
+        else {
+            user = WebUtils.getLoggedInUser();
+        }
+
+
+
+        Page<Document> documentPage;
+
+        if(!StringUtils.hasText(searchedCriteria)){
+            documentPage = documentRepository.findByUserId(user.getId(), pageRequest);
+        } else {
+            documentPage = documentRepository.filterUsersDocuments(user.getId(), searchedCriteria, pageRequest);
+        }
+
+
+        return  documentPage.map(documentMapper::documentToDocumentDto);
+    }
+
+    @Transactional
+    @Override
+    public Page<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus, String searchedCriteria, Integer pageNumber, Integer pageSize) {
+
+        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
+
+        Page<Document> documentPage;
+
+        if(!StringUtils.hasText(searchedCriteria)){
+            documentPage = documentRepository.findByApprovalStatus(documentStatus, pageRequest);
+        } else {
+            System.out.println(searchedCriteria);
+            documentPage = documentRepository.filterApprovedDocuments(documentStatus, searchedCriteria, pageRequest);
+        }
+
+        return  documentPage.map(documentMapper::documentToDocumentDto);
+    }
+
+    @Transactional
+    @Override
+    public List<DocumentDTO> filterDocuments(String searchedCriteria) {
+        return documentRepository.filterDocuments(searchedCriteria)
                 .stream()
                 .map(documentMapper::documentToDocumentDto)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus) {
-        return documentRepository.findByApprovalStatus(documentStatus)
-                .stream()
-                .map(documentMapper::documentToDocumentDto)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
     @Override
-    public List<DocumentDTO> listDocuments() {
-        return documentRepository.findAll()      
+    public List<DocumentDTO> listDocuments(UUID userId) {
+
+        List<Document> documentList;
+
+        if(userId == null) {
+            documentList = documentRepository.findAll();
+        } else {
+            documentList = documentRepository.findByUserId(userId);
+        }
+
+        return documentList
                 .stream()
                 .map(documentMapper::documentToDocumentDto)
                 .collect(Collectors.toList());
