@@ -38,7 +38,7 @@ public class BootstrapData implements CommandLineRunner {
     public void run(String... args) throws Exception{
         loadUserData();
         loadDocumentData();
-        loadFileOnDisk();
+        //loadFileOnDisk();
     }
 
 

@@ -1,11 +1,14 @@
 package com.springframework.documentmanagementapp.controller;
 
+import com.springframework.documentmanagementapp.entities.Token;
 import com.springframework.documentmanagementapp.exception.EmailAlreadyExistsException;
 import com.springframework.documentmanagementapp.exception.UsernameAlreadyExistsException;
 import com.springframework.documentmanagementapp.model.*;
 import com.springframework.documentmanagementapp.services.DocumentService;
+import com.springframework.documentmanagementapp.services.TokenService;
 import com.springframework.documentmanagementapp.services.UserRegistrationService;
 import com.springframework.documentmanagementapp.services.UserService;
+import com.springframework.documentmanagementapp.webutils.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,9 @@ public class DocumentControllerView {
 
     private final DocumentService documentService;
     private final UserService userService;
+    private final TokenService tokenService;
     private final UserRegistrationService userRegistrationService;
+    private final WebUtils webUtils;
 
 
     @GetMapping("/")
@@ -89,6 +94,12 @@ public class DocumentControllerView {
     @GetMapping(DOCUMENT_PATH_ID)
     public String getDocumentFileById(@PathVariable("documentId") UUID documentId, HttpServletRequest request, Model model) {
 
+        if(webUtils.accessNotApprovedDocuments(documentId) == false){
+            return "no-access-document";
+        }
+
+
+
         // Load file as Resource
         Resource resource = documentService.getDocumentFile(documentId);
 
@@ -115,6 +126,8 @@ public class DocumentControllerView {
         model.addAttribute("documentId",documentId);
         model.addAttribute("fileType", fileType);
         model.addAttribute("document",documentDTO);
+        model.addAttribute("seeUpdateButtons", webUtils.accessDocumentChanges(documentId));
+        model.addAttribute("seeChangeStatusButton", webUtils.accessDocumentStatusChanges());
 
         return "document-file";
     }
@@ -122,18 +135,18 @@ public class DocumentControllerView {
     @GetMapping("/upload")
     public String getUploadForm(Model model){
 
-        model.addAttribute("documentDTO", new DocumentDTO());
+        model.addAttribute("documentDTOForm", new DocumentDTOForm());
 
         return "uploadDoc";
     }
 
     @PostMapping("/upload")
-    public String uploadDoc(@Valid DocumentDTO documentDTO, BindingResult result, Model model) {
+    public String uploadDoc(@Valid DocumentDTOForm documentDTOForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "uploadDoc";
         }
         try {
-            DocumentDTO savedDocument = documentService.saveNewDocument(documentDTO);
+            DocumentDTO savedDocument = documentService.saveNewDocument(documentDTOForm);
             return "redirect:/";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", "Doc type not supported");
@@ -143,12 +156,21 @@ public class DocumentControllerView {
 
     @PostMapping(DOCUMENT_PATH_ID + "/delete")
     public String deleteDocument(@PathVariable("documentId") UUID documentId){
+
+        if(webUtils.accessDocumentChanges(documentId) == false){
+            return "no-access-document";
+        }
+
         documentService.deleteById(documentId);
         return "redirect:/";
     }
 
     @GetMapping(DOCUMENT_PATH_ID + "/update/metadata")
     public String getUpdateDocMetadata(@PathVariable("documentId") UUID documentId, Model model){
+
+        if(webUtils.accessDocumentChanges(documentId) == false){
+            return "no-access-document";
+        }
 
         DocumentDTO documentDTO = documentService.getDocumentMetadata(documentId).get();
         model.addAttribute("documentDTO", documentDTO);
@@ -159,6 +181,11 @@ public class DocumentControllerView {
 
     @PostMapping(DOCUMENT_PATH_ID +"/update/metadata")
     public String postUpdateDocMetadata(@PathVariable("documentId") UUID documentId, @Valid DocumentDTO documentDTO, BindingResult result, Model model) {
+
+        if(webUtils.accessDocumentChanges(documentId) == false){
+            return "no-access-document";
+        }
+
         if (result.hasErrors()) {
             return "document-metadata-update";
         }
@@ -169,6 +196,11 @@ public class DocumentControllerView {
     @GetMapping(DOCUMENT_PATH_ID + "/update/file")
     public String getUpdateDocFile(@PathVariable("documentId") UUID documentId, Model model){
 
+        if(webUtils.accessDocumentChanges(documentId) == false){
+            return "no-access-document";
+        }
+
+
         model.addAttribute("documentDTO", new DocumentDTO());
         model.addAttribute("documentId", documentId);
 
@@ -177,6 +209,12 @@ public class DocumentControllerView {
 
     @PostMapping(DOCUMENT_PATH_ID +"/update/file")
     public String postUpdateDocFile(@PathVariable("documentId") UUID documentId, @Valid DocumentDTO documentDTO, BindingResult result, Model model) {
+
+        if(webUtils.accessDocumentChanges(documentId) == false){
+            return "no-access-document";
+        }
+
+
         if (result.hasErrors()) {
             return "document-file-update";
         }
@@ -188,6 +226,10 @@ public class DocumentControllerView {
     @GetMapping(DOCUMENT_PATH_ID + "/update/status")
     public String getUpdateDocStatus(@PathVariable("documentId") UUID documentId, Model model){
 
+        if(webUtils.accessDocumentStatusChanges() == false){
+            return "access-restricted";
+        }
+
         model.addAttribute("documentId", documentId);
 
         return "document-status-update";
@@ -195,6 +237,11 @@ public class DocumentControllerView {
 
     @PostMapping(DOCUMENT_PATH_ID +"/update/status")
     public String postUpdateDocStatus(@PathVariable("documentId") UUID documentId, @RequestPart("status") String status, BindingResult result, Model model) {
+
+        if(webUtils.accessDocumentStatusChanges() == false){
+            return "access-restricted";
+        }
+
         if (result.hasErrors()) {
             return "document-status-update";
         }
@@ -290,6 +337,8 @@ public class DocumentControllerView {
         for(DocumentDTO documentDTO : documentDTOList) {
             documentService.deleteById(documentDTO.getId());
         }
+
+        tokenService.deleteUsersTokens(userId);
         userService.deleteUserById(userId);
 
         return "redirect:/admin/users";
@@ -312,10 +361,5 @@ public class DocumentControllerView {
 
         return "redirect:" + "/admin/user/{userId}/page/1";
     }
-
-
-
-
-
 
 }

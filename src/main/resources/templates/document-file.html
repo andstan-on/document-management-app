@@ -39,7 +39,7 @@
         </div>
         <div class="card-footer">
             <!-- Add a button to update metadata -->
-            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/metadata'}">Update Metadata</a>
+            <a  data-th-if="${seeUpdateButtons}" class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/metadata'}">Update Metadata</a>
         </div>
     </div>
 
@@ -59,13 +59,13 @@
         </div>
         <div class="card-footer">
             <!-- Add a button to update the file -->
-            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/file'}">Update File</a>
+            <a data-th-if="${seeUpdateButtons}" class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/file'}">Update File</a>
             <!-- Add a button to download the file -->
             <a class="btn btn-success" data-th-href="@{'/api/v1/document/' + ${documentId}}">Download File</a>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 mt-4">
+        <div data-th-if="${seeUpdateButtons}" class="col-md-12 mt-4">
             <!-- Use a form to submit the delete request -->
             <form id="deleteForm" data-th-action="@{'/document/' + ${documentId} + '/delete'}" method="post">
                 <!-- Set the method to DELETE -->
@@ -75,7 +75,7 @@
             </form>
         </div>
         <div class="col-md-12 mt-4">
-            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/status'}">Update Status</a>
+            <a  data-th-if="${seeChangeStatusButton}" class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/status'}">Update Status</a>
         </div>
     </div>
 </div>

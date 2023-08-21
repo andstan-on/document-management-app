@@ -1,6 +1,7 @@
 package com.springframework.documentmanagementapp.services;
 
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentDTOForm;
 import com.springframework.documentmanagementapp.model.DocumentStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public interface DocumentService {
 
     Resource getDocumentFile(UUID id);
 
-    DocumentDTO saveNewDocument(DocumentDTO document);
+    DocumentDTO saveNewDocument(DocumentDTOForm document);
 
     Optional<DocumentDTO> updateDocumentMetadata(UUID documentId, DocumentDTO document);
 

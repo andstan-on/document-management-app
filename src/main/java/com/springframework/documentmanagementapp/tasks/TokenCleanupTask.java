@@ -14,7 +14,7 @@ public class TokenCleanupTask {
         this.tokenService = tokenService;
     }
 
-    @Scheduled(cron = "0 0 * * * *") // Run every hour
+    @Scheduled(cron = "0 */20 * * * *") // Run every 20 minutes
     public void deleteExpiredTokens() {
         tokenService.deleteExpiredTokens();
     }

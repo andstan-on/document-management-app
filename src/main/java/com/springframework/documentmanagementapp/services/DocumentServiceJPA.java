@@ -5,10 +5,7 @@ import com.springframework.documentmanagementapp.exception.MyFileNotFoundExcepti
 import com.springframework.documentmanagementapp.entities.Document;
 import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
-import com.springframework.documentmanagementapp.model.DocumentDTO;
-import com.springframework.documentmanagementapp.model.DocumentFileType;
-import com.springframework.documentmanagementapp.model.DocumentStatus;
-import com.springframework.documentmanagementapp.model.UserRole;
+import com.springframework.documentmanagementapp.model.*;
 import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
@@ -190,7 +187,7 @@ public class DocumentServiceJPA implements DocumentService {
 
     @Transactional
     @Override
-    public DocumentDTO saveNewDocument(DocumentDTO document) {
+    public DocumentDTO saveNewDocument(DocumentDTOForm document) {
 
         User user = WebUtils.getLoggedInUser();
 
@@ -216,7 +213,7 @@ public class DocumentServiceJPA implements DocumentService {
             throw new IllegalArgumentException("No matching file type found.");
         }
 
-        Document savedDocument = documentRepository.save(documentMapper.documentDtoToDocument(document));
+        Document savedDocument = documentRepository.save(documentMapper.documentDtoFormToDocument(document));
 
         Path targetLocation = this.fileStorageLocation.resolve(savedDocument.getId().toString());
         try {
@@ -262,7 +259,6 @@ public class DocumentServiceJPA implements DocumentService {
             foundDocument.setTaxInformation(document.getTaxInformation());
             foundDocument.setCurrency(document.getCurrency());
             foundDocument.setDescription(document.getDescription());
-            foundDocument.setApprovalStatus(document.getApprovalStatus());
             foundDocument.setComments(document.getComments());
             atomicReference.set(Optional.of(documentMapper.documentToDocumentDto(documentRepository.save(foundDocument))));
         }, () -> {
@@ -338,7 +334,6 @@ public class DocumentServiceJPA implements DocumentService {
 
         //delete original file
         if(file.exists() && !file.isDirectory() && filesInDir==2) {
-            // do something
             file.delete();
         }
 

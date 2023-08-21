@@ -69,7 +69,28 @@
 
         </div>
         <div class="card-footer">
-            <div data-th-replace="~{layout :: pagination}"></div>
+            <div  data-th-if="${totalPages > 1}">
+                <div class="row col-sm-10">
+                    <div class="col-sm-2">
+                        Total Rows: [[${totalItems}]]
+                    </div>
+                    <div class="col-sm-1">
+                    <span data-th-each="i: ${#numbers.sequence(1, totalPages)}">
+      <a data-th-if="${currentPage != i}" data-th-href="@{'/admin/user/' + ${user.id} + '/page/' + ${i}}">[[${i}]]</a>
+      <span data-th-unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+                    </span>
+                    </div>
+                    <div class="col-sm-1">
+                        <a data-th-if="${currentPage < totalPages}" data-th-href="@{'/admin/user/' + ${user.id} + '/page/' + ${currentPage + 1}}">Next</a>
+                        <span data-th-unless="${currentPage < totalPages}">Next</span>
+                    </div>
+
+                    <div class="col-sm-1">
+                        <a data-th-if="${currentPage < totalPages}" data-th-href="@{'/admin/user/' + ${user.id} + '/page/' + ${totalPages}}">Last</a>
+                        <span data-th-unless="${currentPage < totalPages}">Last</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

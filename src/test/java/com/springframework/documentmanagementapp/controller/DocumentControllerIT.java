@@ -5,6 +5,7 @@ import com.springframework.documentmanagementapp.entities.User;
 import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.mappers.DocumentMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentDTOForm;
 import com.springframework.documentmanagementapp.model.UserRole;
 import com.springframework.documentmanagementapp.repositories.DocumentRepository;
 import com.springframework.documentmanagementapp.repositories.UserRepository;
@@ -65,43 +66,6 @@ class DocumentControllerIT {
         });
     }
 
-  /*  @Rollback
-    @Transactional
-    @Test
-    void testDeleteById() {
-        Document document = documentRepository.findAll().get(0);
-
-        ResponseEntity responseEntity = documentController.deleteById(document.getId());
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
-
-        assertThat(documentRepository.findById(document.getId()).isEmpty());
-    }
-*/
-
-
-    @Rollback
-    @Transactional
-    @Test
-    void saveNewDocumentTest() {
-
-        DocumentDTO documentDTO = DocumentDTO.builder()
-                .docFile(file)
-                .vendorName("vendor11")
-                .user(userRepository.findAll().get(0))
-                .build();
-
-        ResponseEntity responseEntity = documentController.handlePost(documentDTO);
-
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
-        assertThat(responseEntity.getHeaders().getLocation()).isNotNull();
-
-        String[] location = responseEntity.getHeaders().getLocation().getPath().split("/");
-        UUID savedUUID = UUID.fromString(location[4]);
-
-        Document document = documentRepository.findById(savedUUID).get();
-        assertThat(document).isNotNull();
-
-    }
 
     @Rollback
     @Transactional

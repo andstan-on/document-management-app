@@ -50,7 +50,11 @@ public class UserRegistrationService {
 
 
         user.setLocked(false);
+        user.setEnabled(true);
+        user.setVersion(1);
         User savedUser = userRepository.save(user);
+
+
 
     }
 
@@ -80,7 +84,7 @@ public class UserRegistrationService {
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .app_user(savedUser)
+                .appUser(savedUser)
                 .build();
 
         tokenRepository.save(token);
@@ -107,13 +111,13 @@ public class UserRegistrationService {
                     .token(generatedToken)
                     .createdAt(LocalDateTime.now())
                     .expiresAt(LocalDateTime.now().plusMinutes(10))
-                    .app_user(savedToken.getApp_user())
+                    .appUser(savedToken.getAppUser())
                     .build();
             tokenRepository.save(newToken);
             try {
                 emailService.send(
-                        savedToken.getApp_user().getEmail(),
-                        savedToken.getApp_user().getUsername(),
+                        savedToken.getAppUser().getEmail(),
+                        savedToken.getAppUser().getUsername(),
                         null,
                         "confirm-email-v2",
                         String.format(CONFIRMATION_URL, generatedToken)
@@ -124,7 +128,7 @@ public class UserRegistrationService {
             return "Token expired, a new token has been sent to your email";
         }
 
-        User user = userRepository.findById(savedToken.getApp_user().getId())
+        User user = userRepository.findById(savedToken.getAppUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setEnabled(true);
         userRepository.save(user);
@@ -150,7 +154,7 @@ public class UserRegistrationService {
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .app_user(savedUser)
+                .appUser(savedUser)
                 .build();
 
         tokenRepository.save(token);
@@ -176,13 +180,13 @@ public class UserRegistrationService {
                     .token(generatedToken)
                     .createdAt(LocalDateTime.now())
                     .expiresAt(LocalDateTime.now().plusMinutes(10))
-                    .app_user(savedToken.getApp_user())
+                    .appUser(savedToken.getAppUser())
                     .build();
             tokenRepository.save(newToken);
             try {
                 emailService.send(
-                        savedToken.getApp_user().getEmail(),
-                        savedToken.getApp_user().getUsername(),
+                        savedToken.getAppUser().getEmail(),
+                        savedToken.getAppUser().getUsername(),
                         "Reset Password",
                         "confirm-reset-password",
                         String.format(RESET_URL, generatedToken)
@@ -197,7 +201,7 @@ public class UserRegistrationService {
             throw new RuntimeException("Passwords do not match");
         }
 
-        User user = userRepository.findById(savedToken.getApp_user().getId())
+        User user = userRepository.findById(savedToken.getAppUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(passwordDTO.getNewPassword()));
         userRepository.save(user);
@@ -217,13 +221,13 @@ public class UserRegistrationService {
                     .token(generatedToken)
                     .createdAt(LocalDateTime.now())
                     .expiresAt(LocalDateTime.now().plusMinutes(10))
-                    .app_user(savedToken.getApp_user())
+                    .appUser(savedToken.getAppUser())
                     .build();
             tokenRepository.save(newToken);
             try {
                 emailService.send(
-                        savedToken.getApp_user().getEmail(),
-                        savedToken.getApp_user().getUsername(),
+                        savedToken.getAppUser().getEmail(),
+                        savedToken.getAppUser().getUsername(),
                         "Reset Password",
                         "confirm-reset-password",
                         String.format(RESET_URL_VIEW, generatedToken)
@@ -247,13 +251,13 @@ public class UserRegistrationService {
                     .token(generatedToken)
                     .createdAt(LocalDateTime.now())
                     .expiresAt(LocalDateTime.now().plusMinutes(10))
-                    .app_user(savedToken.getApp_user())
+                    .appUser(savedToken.getAppUser())
                     .build();
             tokenRepository.save(newToken);
             try {
                 emailService.send(
-                        savedToken.getApp_user().getEmail(),
-                        savedToken.getApp_user().getUsername(),
+                        savedToken.getAppUser().getEmail(),
+                        savedToken.getAppUser().getUsername(),
                         "Reset Password",
                         "confirm-reset-password",
                         String.format(RESET_URL_VIEW, generatedToken)
@@ -268,7 +272,7 @@ public class UserRegistrationService {
             throw new PasswordsDoNotMatchException("Passwords do not match");
         }
 
-        User user = userRepository.findById(savedToken.getApp_user().getId())
+        User user = userRepository.findById(savedToken.getAppUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         userRepository.save(user);

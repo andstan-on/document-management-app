@@ -7,10 +7,10 @@
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-6">
-            <form data-th-action="@{/upload}" data-th-object="${documentDTO}" method="post" class="form" enctype="multipart/form-data">
+            <form data-th-action="@{/upload}" data-th-object="${documentDTOForm}" method="post" class="form" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="docFile">Document File</label>
-                    <input class="form-control" type="file" data-th-field="${documentDTO.docFile}" id="docFile">
+                    <input class="form-control" type="file" data-th-field="${documentDTOForm.docFile}" id="docFile">
                     <div class="alert alert-warning" data-th-if="${#fields.hasErrors('docFile')}" data-th-errors="*{docFile}"></div>
                     <div class="alert alert-warning" data-th-if="${errorMessage}" data-th-text="${errorMessage}"></div>
                 </div>

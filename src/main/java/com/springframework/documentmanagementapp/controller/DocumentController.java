@@ -2,6 +2,7 @@ package com.springframework.documentmanagementapp.controller;
 
 import com.springframework.documentmanagementapp.exception.NotFoundException;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentDTOForm;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class DocumentController {
     }
 
     @PostMapping(REST_DOCUMENT_PATH)
-    public ResponseEntity handlePost(@ModelAttribute DocumentDTO document){
+    public ResponseEntity handlePost(@ModelAttribute DocumentDTOForm document){
 
         DocumentDTO savedDocument = documentService.saveNewDocument(document);
 

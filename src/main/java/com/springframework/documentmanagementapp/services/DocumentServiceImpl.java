@@ -1,6 +1,7 @@
 package com.springframework.documentmanagementapp.services;
 
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentDTOForm;
 import com.springframework.documentmanagementapp.model.DocumentStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -122,7 +123,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public DocumentDTO saveNewDocument(DocumentDTO document) {
+    public DocumentDTO saveNewDocument(DocumentDTOForm document) {
 
         DocumentDTO savedDocument = DocumentDTO.builder()
                 .id(UUID.randomUUID())

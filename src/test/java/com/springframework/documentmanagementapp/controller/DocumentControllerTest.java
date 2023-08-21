@@ -2,6 +2,7 @@ package com.springframework.documentmanagementapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentDTOForm;
 import com.springframework.documentmanagementapp.services.DocumentService;
 import com.springframework.documentmanagementapp.services.DocumentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +76,7 @@ class DocumentControllerTest {
         DocumentDTO document = documentServiceImpl.listDocuments(null).get(0);
         document.setId(null);
 
-        given(documentService.saveNewDocument(any(DocumentDTO.class))).willReturn(documentServiceImpl.listDocuments(null).get(1));
+        given(documentService.saveNewDocument(any(DocumentDTOForm.class))).willReturn(documentServiceImpl.listDocuments(null).get(1));
 
         mockMvc.perform(post(DocumentController.REST_DOCUMENT_PATH)
                 .accept(MediaType.APPLICATION_JSON)
