@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<!-- Display the list of documents -->
+<div class="container mt-4">
+    <h2>My Documents</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Acces File</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-th-each="document : ${documents}">
+            <td data-th-text="${document.fileName}"></td>
+            <td data-th-text="${document.fileType}"></td>
+            <td> <!-- New table cell for the link -->
+                <a data-th-href="@{/document/{id}(id=${document.id})}" class="btn btn-primary">View Details</a>
+            </td>
+            <td data-th-text="${document.approvalStatus}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

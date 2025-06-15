@@ -1,10 +1,17 @@
 package com.springframework.documentmanagementapp.services;
 
-import com.springframework.documentmanagementapp.model.Document;
+import com.springframework.documentmanagementapp.model.DocumentDTO;
+import com.springframework.documentmanagementapp.model.DocumentStatus;
+import com.springframework.documentmanagementapp.property.FileStorageProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -12,12 +19,12 @@ import java.util.*;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-    private Map<UUID, Document> documentMap;
+    private Map<UUID, DocumentDTO> documentMap;
 
     public DocumentServiceImpl(){
         this.documentMap = new HashMap<>();
 
-        Document document1 = Document.builder()
+        DocumentDTO document1 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("receipt")
                 .number(123456)
@@ -34,11 +41,11 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("approved")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
 
-        Document document2 = Document.builder()
+        DocumentDTO document2 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("invoice")
                 .number(113456)
@@ -55,11 +62,11 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("approved")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
 
-        Document document3 = Document.builder()
+        DocumentDTO document3 = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type("receipt")
                 .number(123455)
@@ -76,33 +83,47 @@ public class DocumentServiceImpl implements DocumentService {
                 .taxInformation("tax info")
                 .currency("USD")
                 .description("description")
-                .approvalStatus("pending")
+                .approvalStatus(DocumentStatus.APPROVED)
                 .comments("no extra info")
                 .build();
+
+
 
         documentMap.put(document1.getId(), document1);
         documentMap.put(document2.getId(), document2);
         documentMap.put(document3.getId(), document3);
 
     }
+
+
     @Override
-    public List<Document> listDocuments(){
+    public List<DocumentDTO> listUserDocuments() {
+        return null;
+    }
+
+    @Override
+    public List<DocumentDTO> listDocumentsByApprovalStatus(DocumentStatus documentStatus) {
+        return null;
+    }
+
+    @Override
+    public List<DocumentDTO> listDocuments(){
         return new ArrayList<>(documentMap.values());
 
     }
 
     @Override
-    public Document getDocumentById(UUID id) {
+    public Optional<DocumentDTO> getDocumentMetadata(UUID id) {
 
         log.debug("Get Document by ID - in service" + id.toString());
 
-        return documentMap.get(id);
+        return Optional.ofNullable(documentMap.get(id));
     }
 
     @Override
-    public Document saveNewDocument(Document document) {
+    public DocumentDTO saveNewDocument(DocumentDTO document) {
 
-        Document savedDocument = Document.builder()
+        DocumentDTO savedDocument = DocumentDTO.builder()
                 .id(UUID.randomUUID())
                 .type(document.getType())
                 .number(document.getNumber())
@@ -129,8 +150,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void updateDocumentById(UUID documentId, Document document) {
-        Document existing = documentMap.get(documentId);
+    public Optional<DocumentDTO> updateDocumentMetadata(UUID documentId, DocumentDTO document) {
+        DocumentDTO existing = documentMap.get(documentId);
 
         existing.setType(document.getType());
         existing.setNumber(document.getNumber());
@@ -150,11 +171,29 @@ public class DocumentServiceImpl implements DocumentService {
         existing.setApprovalStatus(document.getApprovalStatus());
         existing.setComments(document.getComments());
 
-        documentMap.put(existing.getId(), existing);
+        return Optional.of(existing);
     }
 
     @Override
-    public void deleteById(UUID documentId) {
+    public Boolean deleteById(UUID documentId) {
         documentMap.remove(documentId);
+
+        return true;
+    }
+
+    @Override
+    public Resource getDocumentFile(UUID id) {
+        return null;
+    }
+
+    @Override
+    public Optional<DocumentDTO> updateDocumentFile(UUID documentId, DocumentDTO document) {
+        return Optional.empty() ;
+    }
+
+    @Override
+    public Optional<DocumentDTO> updateDocumentStatus(UUID documentId, DocumentStatus documentStatus) {
+        return Optional.empty();
     }
 }
+

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<!-- Display the list of documents -->
+<div class="container mt-4">
+    <h2>Profile</h2>
+    <div class="row mt-3">
+        <div class="col">
+            <strong>Username:</strong> <span data-th-text="${user.username}"></span>
+        </div>
+        <div class="col">
+            <strong>First Name:</strong> <span data-th-text="${user.firstName}"></span>
+        </div>
+        <div class="col">
+            <strong>Last Name:</strong> <span data-th-text="${user.lastName}"></span>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col">
+            <strong>Email:</strong> <span data-th-text="${user.email}"></span>
+        </div>
+        <div class="col">
+            <strong>Date of Birth:</strong> <span data-th-text="${user.dateOfBirth}"></span>
+        </div>
+        <div class="col">
+            <strong>Role:</strong> <span data-th-text="${user.role}"></span>
+        </div>
+    </div>
+
+</div>
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

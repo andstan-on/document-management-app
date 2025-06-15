@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Welcome, <span data-th-text="${username}"></span>!</h2>
+                    <p class="card-text">We're excited to have you get started. First, you need to confirm your account. Just press the button below.</p>
+                    <a class="btn btn-primary" data-th-href="${confirmationUrl}">Confirm Account</a>
+                    <p class="card-text mt-3">If that doesn't work, copy and paste the following link in your browser:</p>
+                    <a data-th-href="${confirmationUrl}">
+                        <p data-th-text="${confirmationUrl}"></p>
+                    </a>
+                    <p class="card-text mt-3">If you have any questions, just reply to this email—we're always happy to help out.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+
+</body>
+
+</html>

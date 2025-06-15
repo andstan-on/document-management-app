@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en" >
+<head data-th-replace="~{layout :: head}"></head>
+<body>
+<nav data-th-replace="~{layout :: navbar}"></nav>
+
+<!-- Display the URL resource -->
+<div class="container mt-4">
+    <!-- Assuming 'resource' is a Resource object, you can use it to display the PDF file -->
+    <!-- For example, using an <embed> tag to show the PDF content -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="mb-0">Metadata</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Type:</strong> <span data-th-text="${document.type}"></span></p>
+                    <p><strong>Number:</strong> <span data-th-text="${document.number}"></span></p>
+                    <p><strong>Date of Issue:</strong> <span data-th-text="${document.dateOfIssue}"></span></p>
+                    <p><strong>Date of Payment:</strong> <span data-th-text="${document.dateOfPayment}"></span></p>
+                    <p><strong>Vendor Name:</strong> <span data-th-text="${document.vendorName}"></span></p>
+                    <p><strong>Vendor Info:</strong> <span data-th-text="${document.vendorInfo}"></span></p>
+                    <p><strong>Customer Name:</strong> <span data-th-text="${document.customerName}"></span></p>
+                    <p><strong>Customer Info:</strong> <span data-th-text="${document.customerInfo}"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Amount Due:</strong> <span data-th-text="${document.amountDue}"></span></p>
+                    <p><strong>Amount Paid:</strong> <span data-th-text="${document.amountPaid}"></span></p>
+                    <p><strong>Payment Method:</strong> <span data-th-text="${document.paymentMethod}"></span></p>
+                    <p><strong>Purchase Order Number:</strong> <span data-th-text="${document.purchaseOrderNumber}"></span></p>
+                    <p><strong>Tax Information:</strong> <span data-th-text="${document.taxInformation}"></span></p>
+                    <p><strong>Currency:</strong> <span data-th-text="${document.currency}"></span></p>
+                    <p><strong>Description:</strong> <span data-th-text="${document.description}"></span></p>
+                    <p><strong>Comments:</strong> <span data-th-text="${document.comments}"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <!-- Add a button to update metadata -->
+            <button class="btn btn-primary" onclick="openUpdateMetadataModal()">Update Metadata</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0">File</h2>
+        </div>
+        <div class="card-body">
+            <img data-th-if="${fileType != 'pdf'}" class="img-fluid" data-th-src="@{'http://localhost:8080/api/v1/document/' + ${documentId}}" alt="Document Image">
+            <div class="container mt-4" data-th-if="${fileType == 'pdf'}">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="pdfViewer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <!-- Add a button to update the file -->
+            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/file'}">Update File</a>
+            <!-- Add a button to download the file -->
+            <a class="btn btn-success" data-th-href="@{'/api/v1/document/' + ${documentId}}">Download File</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mt-4">
+            <!-- Use a form to submit the delete request -->
+            <form id="deleteForm" data-th-action="@{'/document/' + ${documentId} + '/delete'}" method="post">
+                <!-- Set the method to DELETE -->
+                <input type="hidden" name="_method" value="DELETE">
+                <!-- Style the submit button as a delete button and attach an onclick event -->
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Document</button>
+            </form>
+        </div>
+        <div class="col-md-12 mt-4">
+            <a class="btn btn-primary" data-th-href="@{'/document/' + ${documentId} + '/update/status'}">Update Status</a>
+        </div>
+    </div>
+</div>
+
+<footer data-th-replace="~{layout :: footer}"></footer>
+
+<script data-th-replace="~{layout :: script}"></script>
+<script>
+    function confirmDelete() {
+        // Show the confirmation dialog
+        var isConfirmed = confirm("Are you sure you want to delete this document?");
+
+        // If user confirms, submit the form
+        if (isConfirmed) {
+            document.getElementById("deleteForm").submit();
+        }
+    }
+</script>
+<script data-th-inline="javascript">
+    // PDF URL
+    const pdfUrl = 'http://localhost:8080/api/v1/document/' + /*[[${documentId}]]*/;
+
+    // The ID of the div element where the PDF will be rendered
+    const container = document.getElementById('pdfViewer');
+
+    // Function to render all pages of the PDF
+    function renderAllPages(url, container) {
+      // Fetch the PDF file
+      fetch(url)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          // Load the PDF data
+          pdfjsLib.getDocument(data).promise.then(pdf => {
+            // Set the total number of pages
+            const numPages = pdf.numPages;
+
+            // Function to render a specific page
+            function renderPage(pageNumber) {
+              pdf.getPage(pageNumber).then(page => {
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render the page on the canvas
+                const renderContext = {
+                  canvasContext: context,
+                  viewport: viewport
+                };
+                page.render(renderContext);
+
+                // Add the canvas to the container
+                container.appendChild(canvas);
+
+                // Render the next page (if available) after a small delay to ensure smooth rendering
+                if (pageNumber < numPages) {
+                  setTimeout(() => {
+                    renderPage(pageNumber + 1);
+                  }, 50);
+                }
+              });
+            }
+
+            // Start rendering the pages from the first page
+            renderPage(1);
+          });
+        })
+        .catch(error => console.error('Error loading PDF:', error));
+    }
+
+    // Call the renderAllPages function with the URL and container ID
+    renderAllPages(pdfUrl, container);
+  </script>
+
+</body>
+
+</html>
